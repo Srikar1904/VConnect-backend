@@ -19,12 +19,15 @@ app.use(express.json());
 app.use(express.static('../'));
 
 // ================= DATABASE CONNECTION =================
+const isCloud = process.env.DB_HOST && process.env.DB_HOST !== "localhost";
+
 const db = mysql.createConnection({
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
   password: process.env.DB_PASSWORD || "root",
   database: process.env.DB_NAME || "vconnect",
-  port: process.env.DB_PORT || 3306
+  port: parseInt(process.env.DB_PORT) || 3306,
+  ssl: isCloud ? { rejectUnauthorized: false } : false
 });
 
 db.connect((err) => {
