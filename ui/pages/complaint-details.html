@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>V-Connect | Complaint Details</title>
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/govt-theme.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+<script src="../../ui/js/translator.js"></script>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>Complaint Details</span>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <img src="V-Connect.jpeg" alt="Logo" class="main-logo">
+  <div>
+    <h1>V-Connect</h1>
+    <p>Complaint Resolution & Transparency</p>
+  </div>
+  <!-- Telangana + Rising Telangana -->
+  <img src="../../gov-logos.png" class="gov-logos">
+</div>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <a href="dashboard.html">Dashboard</a>
+  <a href="my-complaints.html">My Complaints</a>
+  <a href="profile.html">Profile</a>
+  <a href="../../login.html">Logout</a>
+</div>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - Complaint Details • VConnect - Complaint Details • VConnect - Complaint Details</span></div>
+  <h2>Complaint Details</h2>
+  <p>Full information about your complaint</p>
+</div>
+
+<!-- MAIN -->
+<div class="dashboard">
+
+  <!-- BASIC INFO -->
+  <div class="info-box">
+    <h2>Road Damage Near School</h2>
+    <p><strong>Complaint ID:</strong> VC-10234</p>
+    <p><strong>Location:</strong> Main Street, Ward-3</p>
+    <p><strong>Reported On:</strong> 15 Jan 2026</p>
+    <p><strong>Status:</strong> <span class="status resolved">Resolved</span></p>
+  </div>
+
+  <!-- IMAGE COMPARISON -->
+  <h3 class="section-title">Problem Images</h3>
+
+  <div class="image-grid">
+    <div>
+      <p><strong>Before</strong></p>
+      <img src="../assets/images/sample-problem.jpg" alt="Before Image">
+    </div>
+
+    <div>
+      <p><strong>After</strong></p>
+      <img src="../assets/images/sample-solved.jpg" alt="After Image">
+    </div>
+  </div>
+
+  <!-- STATUS TIMELINE -->
+  <h3 class="section-title">Status Timeline</h3>
+
+  <ul class="timeline">
+    <li>✔ Complaint Submitted by Citizen</li>
+    <li>✔ Verified by Sarpanch</li>
+    <li>✔ Work Completed</li>
+    <li>✔ Approved by Admin</li>
+  </ul>
+
+  <!-- ADMIN REMARKS -->
+  <h3 class="section-title">Official Remarks</h3>
+
+  <div class="info-box">
+    <p>
+      The damaged road section near the school was repaired using concrete
+      material. The work was completed within 3 days and inspected by the
+      village authorities.
+    </p>
+  </div>
+
+  <!-- FINANCIAL TRANSPARENCY -->
+  <h3 class="section-title">Fund Utilization</h3>
+
+  <div class="finance-box">
+    <p><strong>Amount Sanctioned:</strong> ₹50,000</p>
+    <p><strong>Amount Spent:</strong> ₹47,500</p>
+    <p><strong>Remaining:</strong> ₹2,500</p>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+<script>
+  if (localStorage.getItem("isLoggedIn") !== "true") {
+    window.location.href = "../../login.html";
+  }
+</script>
+
+</body>
+</html>

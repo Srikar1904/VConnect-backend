@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All Complaints | V-Connect</title>
+  <link rel="stylesheet" href="../ui/css/base.css">
+  <link rel="stylesheet" href="../ui/css/govt-theme.css">
+  <link rel="stylesheet" href="../ui/css/layout.css">
+  <link rel="stylesheet" href="../ui/css/responsive.css">
+  <link rel="stylesheet" href="../ui/css/admin.css">
+<script src="../ui/js/translator.js"></script>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ================= GOVT TOP BAR ================= -->
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>Official Citizen Grievance Portal</span>
+</div>
+
+<!-- ================= HEADER ================= -->
+<div class="header">
+  <img src="../V-Connect.jpeg" class="main-logo" alt="VConnect Logo">
+
+  <div>
+    <h1>V-Connect</h1>
+    <p>Admin Portal</p>
+  </div>
+
+  <img src="../gov-logos.png" class="gov-logos" alt="Gov Logos">
+</div>
+
+<!-- ================= NAVBAR ================= -->
+<div class="navbar">
+  <div class="nav-center">
+    <a href="../index.html">Home</a>
+    <a href="admin-dashboard.html">Dashboard</a>
+    <a href="admin-all-complaints.html">Complaints</a>
+  </div>
+  <div class="nav-right">
+    <a href="#" class="profile-btn" onclick="localStorage.setItem('adminLoggedIn','false'); window.location.href='admin-login.html'">Logout</a>
+  </div>
+</div>
+
+<script>
+if(localStorage.getItem("adminLoggedIn") !== "true"){
+  window.location.href = "admin-login.html";
+}
+</script>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - All Complaints • VConnect - All Complaints • VConnect - All Complaints</span></div>
+  <h2>All Complaints</h2>
+  <p>Manage and track citizen grievances</p>
+</div>
+
+<!-- ================= COMPLAINTS CONTAINER ================= -->
+<div class="main">
+  <h2 style="text-align: center; color: #1a237e; margin-bottom: 30px;">All Citizen Complaints</h2>
+  <div id="complaintsContainer" style="max-width: 1200px; margin: 0 auto;"></div>
+</div>
+
+<script>
+function showToast(message, type = "success") {
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<div class="toast-content"><span class="toast-message">${message}</span></div>`;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = "toastOut 0.4s ease forwards";
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
+
+function getStatusBadgeClass(status) {
+  const statusMap = {
+    'pending': 'pending',
+    'in progress': 'inprogress',
+    'resolved': 'resolved'
+  };
+  return statusMap[status.toLowerCase()] || 'pending';
+}
+
+function getFundAllocation(complaintId) {
+  const allocations = JSON.parse(localStorage.getItem("fundAllocations")) || {};
+  return allocations[complaintId] || null;
+}
+
+fetch("http://localhost:5000/api/admin/complaints")
+.then(res => {
+  console.log("API Response Status:", res.status);
+  
+  if (!res.ok) {
+    throw new Error(`HTTP error! status: ${res.status}`);
+  }
+  
+  return res.json();
+})
+.then(data => {
+  console.log("Complaints Data Received:", data);
+  const container = document.getElementById("complaintsContainer");
+
+  if(!data || data.length === 0) {
+    container.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">No complaints found.</p>';
+    return;
+  }
+
+  data.forEach(c => {
+    // Get fund allocation if exists
+    const allocation = getFundAllocation(c.complaint_id);
+    const displayStatus = allocation ? allocation.status : c.status;
+    const statusClass = getStatusBadgeClass(displayStatus);
+    
+    const complaintCard = document.createElement('div');
+    complaintCard.className = 'complaint-card';
+    
+    // Build fund info section if allocation exists
+    let fundInfoHTML = '';
+    if (allocation) {
+      fundInfoHTML = `
+        <div style="background: #e8f5e9; border-left: 4px solid #4caf50; padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <p style="margin: 0 0 10px 0; color: #2e7d32; font-weight: bold;">💰 Fund Allocation Completed</p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; font-size: 13px;">
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666;">Allocated Amount</p>
+              <p style="margin: 0; color: #1a237e; font-weight: bold; font-size: 16px;">₹${allocation.amount.toLocaleString('en-IN')}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666;">Allocation Status</p>
+              <p style="margin: 0; color: #1a237e; font-weight: bold;">${allocation.status}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666;">Allocated Date</p>
+              <p style="margin: 0; color: #1a237e; font-weight: bold;">${new Date(allocation.timestamp).toLocaleDateString()}</p>
+            </div>
+          </div>
+          <p style="margin: 10px 0 0 0; color: #555; font-size: 13px;"><strong>Notes:</strong> ${allocation.notes}</p>
+        </div>
+      `;
+    }
+    
+    complaintCard.innerHTML = `
+      <div style="display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start;">
+        <div style="flex-shrink: 0;">
+          <img src="${c.image}" width="180" style="border-radius: 12px; object-fit: cover; height: 180px;"/>
+        </div>
+        <div>
+          <h3 style="margin-top: 0; color: #1a237e;">${c.type || 'Complaint'}</h3>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;">
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 13px;"><strong>Complaint ID</strong></p>
+              <p style="margin: 0; color: #1a237e; font-weight: bold;">${c.complaint_id}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 13px;"><strong>Mobile</strong></p>
+              <p style="margin: 0; color: #1a237e; font-weight: bold;">${c.user_mobile}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 13px;"><strong>Location</strong></p>
+              <p style="margin: 0; color: #1a237e;">${c.location}</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 5px 0; color: #666; font-size: 13px;"><strong>Status</strong></p>
+              <span class="status ${statusClass}" style="display: inline-block;">${displayStatus}</span>
+            </div>
+          </div>
+
+          <p style="margin: 15px 0; color: #555; line-height: 1.6;">
+            <strong>Description:</strong> ${c.description || 'N/A'}
+          </p>
+
+          ${fundInfoHTML}
+
+          <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <a href="admin-fund.html?id=${c.complaint_id}" style="text-decoration: none;">
+              <button style="background: #1a237e; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">
+                ${allocation ? '✏️ Edit Allocation' : '💰 Allocate Fund'}
+              </button>
+            </a>
+            <button style="background: #666; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;" onclick="viewDetails('${c.complaint_id}')">
+              📋 View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    container.appendChild(complaintCard);
+  });
+
+  showToast(`✅ Loaded ${data.length} complaints`, 'success');
+})
+.catch(err => {
+  console.error("Error fetching complaints:", err);
+  showToast('❌ Error loading complaints. Check if backend is running.', 'error');
+  document.getElementById("complaintsContainer").innerHTML = '<p style="text-align: center; padding: 40px; color: red;">Failed to load complaints. Backend may be offline.</p>';
+});
+
+function viewDetails(complaintId) {
+  const allocation = getFundAllocation(complaintId);
+  if (allocation) {
+    showToast(`📋 Complaint ${complaintId} - Fund: ₹${allocation.amount}`, 'info');
+  } else {
+    showToast(`📋 Viewing details for complaint: ${complaintId}`, 'info');
+  }
+}
+
+// ================= SMOOTH HOVER ALERT SYSTEM =================
+
+/**
+ * Create a hover alert for any element
+ * @param {string} selector - CSS selector for the element
+ * @param {string} message - Alert message
+ * @param {string} type - Alert type: 'info', 'success', 'warning', 'error'
+ */
+function addHoverAlert(selector, message, type = 'info') {
+  const elements = document.querySelectorAll(selector);
+  elements.forEach(element => {
+    // Skip if already has alert
+    if (element.querySelector('.alert-popup')) return;
+
+    // Create alert container
+    const alertContainer = document.createElement('div');
+    alertContainer.className = 'hover-alert';
+
+    // Create alert popup
+    const alertPopup = document.createElement('div');
+    alertPopup.className = `alert-popup ${type}`;
+    alertPopup.textContent = message;
+
+    // Wrap element if needed
+    if (element.parentNode.classList.contains('hover-alert')) return;
+
+    // Insert alert
+    element.parentNode.insertBefore(alertContainer, element);
+    alertContainer.appendChild(element);
+    alertContainer.appendChild(alertPopup);
+  });
+}
+
+// Initialize hover alerts on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Add hover alerts to complaint cards and buttons
+  setTimeout(() => {
+    addHoverAlert('.admin-card', 'Click to view complaint details', 'info');
+    addHoverAlert('.admin-btn', 'Allocate funds for this complaint', 'success');
+    addHoverAlert('.status-badge', 'Current status of the complaint', 'info');
+  }, 1000); // Wait for dynamic content to load
+});
+
+</script>
+
+<!-- FOOTER -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+
+</body>
+</html>

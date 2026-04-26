@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fund Allocation | V-Connect</title>
+  <link rel="stylesheet" href="../ui/css/base.css">
+  <link rel="stylesheet" href="../ui/css/govt-theme.css">
+  <link rel="stylesheet" href="../ui/css/layout.css">
+  <link rel="stylesheet" href="../ui/css/responsive.css">
+  <link rel="stylesheet" href="../ui/css/admin.css">
+  <style>
+    .fund-allocation-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .fund-section {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    .fund-section h3 {
+      color: #1a237e;
+      margin-top: 0;
+      padding-bottom: 15px;
+      border-bottom: 3px solid #f0f0f0;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #1a237e;
+      box-shadow: 0 0 8px rgba(26,35,126,0.2);
+      outline: none;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .complaint-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border-left: 4px solid #1a237e;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+
+    .info-row .label {
+      color: #666;
+      font-weight: 500;
+    }
+
+    .info-row .value {
+      color: #1a237e;
+      font-weight: bold;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .action-buttons button {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-submit {
+      background: #1a237e;
+      color: white;
+    }
+
+    .btn-submit:hover {
+      background: #3949ab;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(26,35,126,0.3);
+    }
+
+    .btn-cancel {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn-cancel:hover {
+      background: #d0d0d0;
+    }
+
+    .amount-input-group {
+      position: relative;
+    }
+
+    .amount-input-group::before {
+      content: '₹';
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: #1a237e;
+      font-weight: bold;
+    }
+
+    .amount-input-group input {
+      padding-left: 35px;
+    }
+
+    @media (max-width: 768px) {
+      .fund-allocation-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+<script src="../ui/js/translator.js"></script>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ================= GOVT TOP BAR ================= -->
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>Official Citizen Grievance Portal</span>
+</div>
+
+<!-- ================= HEADER ================= -->
+<div class="header">
+  <img src="../V-Connect.jpeg" class="main-logo" alt="VConnect Logo">
+
+  <div>
+    <h1>V-Connect</h1>
+    <p>Admin Portal</p>
+  </div>
+
+  <img src="../gov-logos.png" class="gov-logos" alt="Gov Logos">
+</div>
+
+<!-- ================= NAVBAR ================= -->
+<div class="navbar">
+  <div class="nav-center">
+    <a href="../index.html">Home</a>
+    <a href="admin-dashboard.html">Dashboard</a>
+    <a href="admin-all-complaints.html">Complaints</a>
+  </div>
+  <div class="nav-right">
+    <a href="#" class="profile-btn" onclick="localStorage.setItem('adminLoggedIn','false'); window.location.href='admin-login.html'">Logout</a>
+  </div>
+</div>
+
+<script>
+if(localStorage.getItem("adminLoggedIn") !== "true"){
+  window.location.href = "admin-login.html";
+}
+</script>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - Fund Allocation • VConnect - Fund Allocation • VConnect - Fund Allocation</span></div>
+  <h2>Fund Allocation</h2>
+  <p>Manage budget allocation for grievance resolution</p>
+</div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="main">
+  <div class="fund-allocation-grid">
+    <!-- Complaint Information Section -->
+    <div class="fund-section">
+      <h3>📋 Complaint Details</h3>
+      <div class="complaint-info">
+        <div class="info-row">
+          <span class="label">Complaint ID:</span>
+          <span class="value" id="complaintIdDisplay">-</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Type:</span>
+          <span class="value" id="complaintTypeDisplay">-</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Status:</span>
+          <span class="value" id="complaintStatusDisplay">-</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Location:</span>
+          <span class="value" id="complaintLocationDisplay">-</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Reported By:</span>
+          <span class="value" id="complaintUserDisplay">-</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fund Allocation Form Section -->
+    <div class="fund-section">
+      <h3>💰 Allocate Budget</h3>
+      
+      <div class="form-group">
+        <label>Fund Amount (₹)</label>
+        <div class="amount-input-group">
+          <input 
+            type="number" 
+            id="fundAmount" 
+            placeholder="Enter amount in rupees" 
+            min="0" 
+            step="100"
+            required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Status Update</label>
+        <select id="status" required>
+          <option value="">-- Select Status --</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Resolved">Resolved</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Notes / Comments</label>
+        <textarea 
+          id="notes" 
+          placeholder="Add any additional notes or comments about this allocation..."
+          required></textarea>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-submit" onclick="updateFund()">✅ Submit Allocation</button>
+        <button class="btn-cancel" onclick="goBack()">❌ Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+
+<script>
+let currentComplaint = null;
+
+function showToast(message, type = "success") {
+  const toastContainer = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<div class="toast-content"><span class="toast-message">${message}</span></div>`;
+
+  toastContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = "toastOut 0.4s ease forwards";
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
+
+function saveCitizenNotification(notification) {
+  const notifications = JSON.parse(localStorage.getItem("citizenNotifications")) || [];
+  notifications.unshift(notification);
+  localStorage.setItem("citizenNotifications", JSON.stringify(notifications));
+}
+
+function getComplaintIdFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('id');
+}
+
+function loadComplaintDetails() {
+  const complaintId = getComplaintIdFromURL();
+  
+  if (!complaintId) {
+    showToast("❌ No complaint ID provided", "error");
+    return;
+  }
+
+  // Fetch the complaint details
+  fetch(`http://localhost:5000/api/admin/complaints`)
+    .then(res => res.json())
+    .then(data => {
+      // Find the complaint with matching ID
+      const complaint = data.find(c => c.complaint_id == complaintId);
+      
+      if (complaint) {
+        currentComplaint = complaint;
+        document.getElementById("complaintIdDisplay").textContent = complaint.complaint_id;
+        document.getElementById("complaintTypeDisplay").textContent = complaint.type || "N/A";
+        document.getElementById("complaintStatusDisplay").textContent = complaint.status || "pending";
+        document.getElementById("complaintLocationDisplay").textContent = complaint.location || "N/A";
+        document.getElementById("complaintUserDisplay").textContent = complaint.user_mobile || "N/A";
+        
+        // Check if there's an existing allocation and pre-fill the form
+        const allocations = JSON.parse(localStorage.getItem("fundAllocations")) || {};
+        const existingAllocation = allocations[complaintId];
+        
+        if (existingAllocation) {
+          document.getElementById("fundAmount").value = existingAllocation.amount;
+          document.getElementById("status").value = existingAllocation.status;
+          document.getElementById("notes").value = existingAllocation.notes;
+          showToast(`✏️ Existing allocation loaded - You can edit and re-submit`, "info");
+        } else {
+          showToast(`✅ Complaint details loaded`, "success");
+        }
+      } else {
+        showToast("❌ Complaint not found", "error");
+      }
+    })
+    .catch(err => {
+      console.error("Error loading complaint:", err);
+      showToast("❌ Error loading complaint details", "error");
+    });
+}
+
+function updateFund(){
+  const complaintId = getComplaintIdFromURL();
+  const amount = document.getElementById("fundAmount").value.trim();
+  const status = document.getElementById("status").value.trim();
+  const notes = document.getElementById("notes").value.trim();
+
+  if (!amount || !status || !notes) {
+    showToast("⚠️ Please fill in all fields", "warning");
+    return;
+  }
+
+  if (amount <= 0) {
+    showToast("❌ Fund amount must be greater than 0", "error");
+    return;
+  }
+
+  // Create allocation object
+  const allocation = {
+    complaintId: complaintId,
+    amount: parseFloat(amount),
+    status: status,
+    notes: notes,
+    timestamp: new Date().toISOString()
+  };
+
+  // Get existing allocations
+  let allocations = JSON.parse(localStorage.getItem("fundAllocations")) || {};
+  
+  // Save this allocation to localStorage
+  allocations[complaintId] = allocation;
+  localStorage.setItem("fundAllocations", JSON.stringify(allocations));
+
+  if (currentComplaint && currentComplaint.user_mobile) {
+    const notification = {
+      id: `notif_${complaintId}_${Date.now()}`,
+      userMobile: currentComplaint.user_mobile,
+      complaintId: complaintId,
+      status: status,
+      title: `Complaint ${complaintId} updated to ${status}`,
+      message: `Your complaint ${complaintId} is now marked as \"${status}\". ${notes}`,
+      type: status === "Resolved" ? "success" : status === "In Progress" ? "info" : "warning",
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+    saveCitizenNotification(notification);
+  }
+
+  showToast(`💾 Saving fund allocation of ₹${amount} for complaint ${complaintId}...`, "success");
+  
+  console.log("Fund Allocation Saved:", allocation);
+  console.log("All Allocations:", allocations);
+
+  // Also update the backend status
+  fetch(`http://localhost:5000/api/admin/update/${complaintId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      status: status,
+      fundAmount: amount,
+      notes: notes
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("Backend Status Updated:", data);
+    
+    setTimeout(() => {
+      showToast("✅ Fund allocation updated successfully! Dashboard will refresh with new counts.", "success");
+      setTimeout(() => {
+        window.location.href = "admin-all-complaints.html";
+      }, 1500);
+    }, 800);
+  })
+  .catch(err => {
+    console.error("Error updating backend:", err);
+    // Still redirect even if backend update fails (data is in localStorage)
+    setTimeout(() => {
+      showToast("✅ Fund allocation saved locally!", "success");
+      setTimeout(() => {
+        window.location.href = "admin-all-complaints.html";
+      }, 1500);
+    }, 800);
+  });
+}
+
+function goBack() {
+  window.location.href = "admin-all-complaints.html";
+}
+
+// Load complaint details on page load
+window.addEventListener('load', loadComplaintDetails);
+</script>
+
+</body>
+</html>

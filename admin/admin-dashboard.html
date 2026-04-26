@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard | V-Connect</title>
+  <link rel="stylesheet" href="../ui/css/base.css">
+  <link rel="stylesheet" href="../ui/css/govt-theme.css">
+  <link rel="stylesheet" href="../ui/css/layout.css">
+  <link rel="stylesheet" href="../ui/css/responsive.css">
+  <link rel="stylesheet" href="../ui/css/admin.css">
+<script src="../ui/js/translator.js"></script>
+</head>
+<body>
+<!-- ================= GOVT TOP BAR ================= -->
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>Official Citizen Grievance Portal</span>
+</div>
+
+<!-- ================= HEADER ================= -->
+<div class="header">
+  <img src="../V-Connect.jpeg" class="main-logo" alt="VConnect Logo">
+
+  <div>
+    <h1>V-Connect</h1>
+    <p>Admin Portal</p>
+  </div>
+
+  <img src="../gov-logos.png" class="gov-logos" alt="Gov Logos">
+</div>
+
+<!-- ================= NAVBAR ================= -->
+<div class="navbar">
+  <div class="nav-center">
+    <a href="../index.html">Home</a>
+    <a href="admin-dashboard.html">Dashboard</a>
+    <a href="admin-all-complaints.html">Complaints</a>
+  </div>
+  <div class="nav-right">
+    <a href="#" class="profile-btn" onclick="localStorage.setItem('adminLoggedIn','false'); window.location.href='admin-login.html'">Logout</a>
+  </div>
+</div>
+
+<script>
+if(localStorage.getItem("adminLoggedIn") !== "true"){
+  window.location.href = "admin-login.html";
+}
+</script>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - Admin Dashboard • VConnect - Admin Dashboard • VConnect - Admin Dashboard</span></div>
+  <h2>Admin Dashboard</h2>
+  <p>Manage all citizen complaints and grievances</p>
+</div>
+
+<div class="dashboard">
+
+  <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); gap: 20px;">
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; padding: 30px;">
+      <h4 style="margin: 0 0 15px 0; font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;">Total Complaints</h4>
+      <p id="totalCount" style="margin: 0; font-size: 48px; font-weight: bold; color: #fff;">0</p>
+    </div>
+
+    <div class="stat-card pending" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; text-align: center; padding: 30px;">
+      <h4 style="margin: 0 0 15px 0; font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;">⏳ Pending</h4>
+      <p id="pendingCount" style="margin: 0; font-size: 48px; font-weight: bold; color: #fff;">0</p>
+    </div>
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; text-align: center; padding: 30px;">
+      <h4 style="margin: 0 0 15px 0; font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;">🔄 In Progress</h4>
+      <p id="inProgressCount" style="margin: 0; font-size: 48px; font-weight: bold; color: #fff;">0</p>
+    </div>
+
+    <div class="stat-card resolved" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; text-align: center; padding: 30px;">
+      <h4 style="margin: 0 0 15px 0; font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;">✅ Resolved</h4>
+      <p id="resolvedCount" style="margin: 0; font-size: 48px; font-weight: bold; color: #fff;">0</p>
+    </div>
+
+  </div>
+
+  <div style="text-align: center; margin: 25px 0;">
+    <p style="color: #666; font-size: 13px;">📊 Updates automatically every 2 seconds</p>
+  </div>
+
+  <br>
+
+  <div style="text-align:center">
+    <a href="admin-all-complaints.html">
+      <button style="padding: 12px 24px;">View All Complaints</button>
+    </a>
+    <button onclick="refreshStats()" style="padding: 12px 24px; margin-left: 10px; background: #4caf50;">🔄 Refresh Now</button>
+  </div>
+
+</div>
+
+<script>
+function fetchAdminStats() {
+  fetch("http://localhost:5000/api/admin/complaints")
+  .then(res => res.json())
+  .then(data => {
+    const totalCount = data.length || 0;
+    const pendingCount = data.filter(c => c.status === "Pending").length || 0;
+    const inProgressCount = data.filter(c => c.status === "In Progress").length || 0;
+    const resolvedCount = data.filter(c => c.status === "Resolved").length || 0;
+    
+    // Update the counts with animation
+    updateCountWithAnimation("totalCount", totalCount);
+    updateCountWithAnimation("pendingCount", pendingCount);
+    updateCountWithAnimation("inProgressCount", inProgressCount);
+    updateCountWithAnimation("resolvedCount", resolvedCount);
+    
+    console.log("📊 Dashboard stats updated:", { totalCount, pendingCount, inProgressCount, resolvedCount });
+  })
+  .catch(err => console.error("Error fetching admin stats:", err));
+}
+
+function updateCountWithAnimation(elementId, newCount) {
+  const element = document.getElementById(elementId);
+  const currentCount = parseInt(element.innerText) || 0;
+  
+  // Only update if count changed
+  if (currentCount !== newCount) {
+    element.style.transition = "all 0.3s ease";
+    element.style.transform = "scale(1.2)";
+    element.innerText = newCount;
+    
+    setTimeout(() => {
+      element.style.transform = "scale(1)";
+    }, 100);
+  }
+}
+
+function refreshStats() {
+  console.log("🔄 Manual refresh triggered");
+  fetchAdminStats();
+  const btn = event.target;
+  btn.innerHTML = "✅ Refreshing...";
+  setTimeout(() => {
+    btn.innerHTML = "🔄 Refresh Now";
+  }, 1000);
+}
+
+// Fetch immediately on page load
+fetchAdminStats();
+
+// Poll every 2 seconds for REAL-TIME updates
+setInterval(fetchAdminStats, 2000);
+
+// ================= SMOOTH HOVER ALERT SYSTEM =================
+
+/**
+ * Create a hover alert for any element
+ * @param {string} selector - CSS selector for the element
+ * @param {string} message - Alert message
+ * @param {string} type - Alert type: 'info', 'success', 'warning', 'error'
+ */
+function addHoverAlert(selector, message, type = 'info') {
+  const elements = document.querySelectorAll(selector);
+  elements.forEach(element => {
+    // Skip if already has alert
+    if (element.querySelector('.alert-popup')) return;
+
+    // Create alert container
+    const alertContainer = document.createElement('div');
+    alertContainer.className = 'hover-alert';
+
+    // Create alert popup
+    const alertPopup = document.createElement('div');
+    alertPopup.className = `alert-popup ${type}`;
+    alertPopup.textContent = message;
+
+    // Wrap element if needed
+    if (element.parentNode.classList.contains('hover-alert')) return;
+
+    // Insert alert
+    element.parentNode.insertBefore(alertContainer, element);
+    alertContainer.appendChild(element);
+    alertContainer.appendChild(alertPopup);
+  });
+}
+
+// Initialize hover alerts on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Add hover alerts to dashboard elements
+  addHoverAlert('.stat-box', 'Click to view detailed statistics', 'info');
+  addHoverAlert('.admin-btn', 'View all complaints and manage them', 'success');
+  addHoverAlert('a[href*="admin-all-complaints"]', 'Navigate to complaints management', 'info');
+});
+
+</script>
+
+<!-- FOOTER -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+
+</body>
+</html>

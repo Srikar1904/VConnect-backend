@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Admin Registration | V-Connect</title>
+
+  <link rel="stylesheet" href="../ui/css/base.css">
+  <link rel="stylesheet" href="../ui/css/govt-theme.css">
+  <link rel="stylesheet" href="../ui/css/layout.css">
+  <link rel="stylesheet" href="../ui/css/responsive.css">
+  <link rel="stylesheet" href="../ui/css/admin.css">
+<script src="../ui/js/translator.js"></script>
+</head>
+
+<body>
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ================= GOVT TOP BAR ================= -->
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>Official Citizen Grievance Portal</span>
+</div>
+
+<!-- ================= HEADER ================= -->
+<div class="header">
+  <img src="../V-Connect.jpeg" class="main-logo" alt="VConnect Logo">
+
+  <div>
+    <h1>V-Connect</h1>
+    <p>Admin Portal</p>
+  </div>
+
+  <img src="../gov-logos.png" class="gov-logos" alt="Gov Logos">
+</div>
+
+<!-- ================= NAVBAR ================= -->
+<div class="navbar">
+  <div class="nav-center">
+    <a href="../index.html">Home</a>
+    <a href="../about.html">About</a>
+    <a href="../how-it-works.html">How It Works</a>
+    <a href="../help.html">Help</a>
+  </div>
+</div>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - Admin Registration • VConnect - Admin Registration • VConnect - Admin Registration</span></div>
+  <h2>Create Admin Account</h2>
+  <p>Register to manage citizen complaints and grievances</p>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="login-box" style="margin: 0 auto; max-width: 500px; width: 100%;">
+    <h2>Admin Registration</h2>
+
+    <div class="login-form active">
+      <label>Full Name</label>
+      <input type="text" id="adminName" placeholder="Enter your full name" required>
+
+      <label>Mobile Number</label>
+      <input type="text" id="adminMobile" placeholder="Enter mobile number" required>
+
+      <label>Any ID Proof (Aadhar/PAN/Employee ID)</label>
+      <input type="text" id="adminIdProof" placeholder="Enter ID Proof Number/Details" required>
+
+      <label>ID Proof Document (Optional)</label>
+      <input type="file" id="adminIdDoc" accept="image/*,.pdf" style="padding: 10px; background: #fff;">
+
+      <label>Password</label>
+      <div class="password-field">
+        <input type="password" id="adminPassword" placeholder="Create password" required>
+      </div>
+
+      <label>Confirm Password</label>
+      <div class="password-field">
+        <input type="password" id="adminConfirmPassword" placeholder="Confirm password" required>
+      </div>
+
+      <button type="button" onclick="registerAdmin()" style="margin-top: 15px;">Register as Admin</button>
+
+      <p style="text-align:center; margin-top:20px; color: #555;">
+        Already registered? <a href="admin-login.html" style="color: var(--primary); font-weight: bold; text-decoration: none;">Login here</a>
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+
+<script>
+  function registerAdmin() {
+    const name = document.getElementById("adminName").value.trim();
+    const mobile = document.getElementById("adminMobile").value.trim();
+    const idProof = document.getElementById("adminIdProof").value.trim();
+    const pwd = document.getElementById("adminPassword").value.trim();
+    const confirmPwd = document.getElementById("adminConfirmPassword").value.trim();
+    
+    console.log("Registration Attempt - Name:", name);
+    console.log("Registration Attempt - Mobile:", mobile);
+    
+    if(!name || !mobile || !idProof || !pwd || !confirmPwd) {
+      showToast("⚠️ Please fill in all required fields.", "warning");
+      return;
+    }
+    
+    if(pwd !== confirmPwd) {
+      showToast("❌ Passwords do not match.", "error");
+      return;
+    }
+    
+    // Validate name has at least 3 characters
+    if(name.length < 3) {
+      showToast("❌ Name must be at least 3 characters long.", "error");
+      return;
+    }
+    
+    // Save admin credentials to allow true login
+    localStorage.setItem("registeredAdminName", name);
+    localStorage.setItem("registeredAdminPassword", pwd);
+    
+    // Verify it was saved
+    const verifyName = localStorage.getItem("registeredAdminName");
+    const verifyPass = localStorage.getItem("registeredAdminPassword");
+    
+    console.log("Saved to localStorage - Name:", verifyName);
+    console.log("Saved to localStorage - Password:", verifyPass ? "***" : "FAILED");
+    
+    if(verifyName !== name || verifyPass !== pwd) {
+      showToast("❌ Error saving registration data. localStorage may be disabled.", "error");
+      console.error("localStorage save verification failed!");
+      return;
+    }
+    
+    showToast(`✅ Admin Registration Successful! Name: '${name}' saved. Redirecting..., remember to use the same name to login...`, "success");
+    setTimeout(() => {
+      window.location.href = "admin-login.html";
+    }, 2000);
+  }
+
+  function showToast(message, type = "success") {
+    const container = document.getElementById("toastContainer");
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<div class="toast-content"><span class="toast-message">${message}</span></div>`;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.animation = "toastOut 0.4s ease forwards";
+      setTimeout(() => toast.remove(), 400);
+    }, 3000);
+  }
+
+  // Check on page load if already registered
+  window.addEventListener('load', () => {
+    const existingName = localStorage.getItem("registeredAdminName");
+    if(existingName) {
+      console.log("⚠️ Admin already registered with name:", existingName);
+      console.log("To register again, <a href='admin-login.html'>login here</a> or clear localStorage");
+    }
+  });
+</script>
+
+</body>
+</html>

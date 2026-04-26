@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V-Connect | Choose Role</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="ui/css/base.css">
+  <link rel="stylesheet" href="ui/css/govt-theme.css">
+  <link rel="stylesheet" href="ui/css/layout.css">
+  <link rel="stylesheet" href="ui/css/responsive.css">
+  
+  <style>
+    .role-page-container {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+    }
+    .role-title {
+      font-size: 2.8rem;
+      color: var(--primary, #0c2340);
+      margin-bottom: 10px;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      animation: fadeInDown 0.8s ease-out;
+    }
+    .role-subtitle {
+      font-size: 1.2rem;
+      color: #555;
+      margin-bottom: 50px;
+      text-align: center;
+      animation: fadeInDown 1s ease-out;
+    }
+    .role-cards-wrapper {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 900px;
+      animation: fadeInUp 1.2s ease-out;
+    }
+    .role-card {
+      background: white;
+      border-radius: 20px;
+      padding: 45px 30px;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-decoration: none;
+      color: inherit;
+      border: 3px solid transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .role-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    .role-icon-wrapper {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 25px;
+      transition: all 0.4s ease;
+      background: #f8f9fa;
+    }
+    .role-icon {
+      font-size: 4rem;
+      line-height: 1;
+      transition: transform 0.4s ease;
+    }
+    .role-name {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary, #0c2340);
+      margin-bottom: 15px;
+    }
+    .role-desc {
+      font-size: 1rem;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      flex-grow: 1;
+    }
+    .role-btn {
+      padding: 14px 35px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: 100%;
+    }
+    
+    /* Roles specific themes */
+    .role-card.citizen {
+      border-bottom: 6px solid #2196F3;
+    }
+    .role-card.citizen .role-icon-wrapper {
+      background: rgba(33, 150, 243, 0.1);
+      box-shadow: 0 0 20px rgba(33, 150, 243, 0.2);
+    }
+    .role-card.citizen .role-btn {
+      background: #2196F3;
+      color: white;
+      box-shadow: 0 6px 15px rgba(33, 150, 243, 0.3);
+    }
+    .role-card.citizen:hover { border-color: #2196F3; }
+    .role-card.citizen:hover .role-name { color: #2196F3; }
+    .role-card.citizen:hover .role-icon { transform: scale(1.15); }
+    .role-card.citizen:hover .role-btn { background: #1976D2; transform: scale(1.05); }
+
+    .role-card.admin {
+      border-bottom: 6px solid #4CAF50;
+    }
+    .role-card.admin .role-icon-wrapper {
+      background: rgba(76, 175, 80, 0.1);
+      box-shadow: 0 0 20px rgba(76, 175, 80, 0.2);
+    }
+    .role-card.admin .role-btn {
+      background: #4CAF50;
+      color: white;
+      box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3);
+    }
+    .role-card.admin:hover { border-color: #4CAF50; }
+    .role-card.admin:hover .role-name { color: #4CAF50; }
+    .role-card.admin:hover .role-icon { transform: scale(1.15); }
+    .role-card.admin:hover .role-btn { background: #388E3C; transform: scale(1.05); }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    
+    @media (max-width: 768px) {
+      .role-cards-wrapper { gap: 20px; }
+      .role-card { width: 100%; max-width: 350px; padding: 30px 20px; }
+      .role-title { font-size: 2.2rem; }
+    }
+  </style>
+<script src="./ui/js/translator.js"></script>
+</head>
+
+<body>
+  <!-- ================= GOVT TOP BAR ================= -->
+  <div class="gov-topbar">
+    <span>Government of Telangana</span>
+    <span>Official Citizen Grievance Portal</span>
+  </div>
+
+  <!-- ================= HEADER ================= -->
+  <div class="header">
+    <img src="V-Connect.jpeg" class="main-logo" alt="V-Connect Logo">
+    <div>
+      <h1>V-Connect</h1>
+      <p>Select User Role</p>
+    </div>
+    <img src="gov-logos.png" class="gov-logos" alt="Government Logos">
+  </div>
+
+  <!-- ================= NAVBAR ================= -->
+  <div class="navbar">
+    <div class="nav-center">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="how-it-works.html">How It Works</a>
+      <a href="help.html">Help</a>
+    </div>
+  </div>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <div class="role-page-container">
+    <!-- Language Selection Buttons -->
+    <div class="language-buttons" style="display: flex; gap: 15px; margin-bottom: 25px; animation: fadeInDown 0.6s ease-out;">
+      <button onclick="setLanguage('en')" class="lang-btn" data-lang="en" style="background: rgba(255, 255, 255, 0.2); border: 2px solid var(--primary, #0c2340); color: var(--primary, #0c2340); padding: 8px 24px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(5px);">English</button>
+      <button onclick="setLanguage('te')" class="lang-btn" data-lang="te" style="background: rgba(255, 255, 255, 0.2); border: 2px solid var(--primary, #0c2340); color: var(--primary, #0c2340); padding: 8px 24px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(5px);">తెలుగు</button>
+      <button onclick="setLanguage('hi')" class="lang-btn" data-lang="hi" style="background: rgba(255, 255, 255, 0.2); border: 2px solid var(--primary, #0c2340); color: var(--primary, #0c2340); padding: 8px 24px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(5px);">हिंदी</button>
+    </div>
+    <style>
+      .lang-btn:hover {
+        background: var(--primary, #0c2340) !important;
+        color: white !important;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(12, 35, 64, 0.3);
+      }
+    </style>
+    <h2 class="role-title">Welcome to V-Connect</h2>
+    <p class="role-subtitle">Please select your role to proceed to the portal</p>
+    
+    <div class="role-cards-wrapper">
+      <!-- Citizen Card -->
+      <a href="login.html" class="role-card citizen">
+        <div class="role-icon-wrapper">
+          <div class="role-icon">👩🏽‍🤝‍👨🏼</div>
+        </div>
+        <div class="role-name">Citizen</div>
+        <div class="role-desc">Login to report issues, track complaints securely, and view fund utilization in your area transparently.</div>
+        <div class="role-btn">Citizen Login</div>
+      </a>
+
+      <!-- Admin Card -->
+      <a href="admin/admin-login.html" class="role-card admin">
+        <div class="role-icon-wrapper">
+          <div class="role-icon">👨🏽‍💼</div>
+        </div>
+        <div class="role-name">Admin</div>
+        <div class="role-desc">Login to manage citizen complaints, oversee fund allocations, and monitor the entire system effectively.</div>
+        <div class="role-btn">Admin Login</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="gov-footer">
+    <p>© 2026 V-Connect | Government of Telangana</p>
+    <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+    <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+    <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+      <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+    </p>
+  </footer>
+
+  <script src="ui/js/hover-effects.js"></script>
+</body>
+</html>

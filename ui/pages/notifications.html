@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V-Connect | Notifications</title>
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/govt-theme.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+<script src="../../ui/js/translator.js"></script>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="gov-topbar">
+  <span>Government of Andhra Pradesh</span>
+  <span>Citizen Notifications</span>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <img src="V-Connect.jpeg" alt="Logo" class="main-logo">
+  <div>
+    <h1>V-Connect</h1>
+    <p>Updates & Alerts</p>
+  </div>
+  <!-- Telangana + Rising Telangana -->
+  <img src="../../gov-logos.png" class="gov-logos">
+</div>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <a href="dashboard.html">Dashboard</a>
+  <a href="my-complaints.html">My Complaints</a>
+  <a href="profile.html">Profile</a>
+  <a href="../../login.html">Logout</a>
+</div>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - Notifications • VConnect - Notifications • VConnect - Notifications</span></div>
+  <h2>Notifications</h2>
+  <p>Stay updated on your complaints</p>
+</div>
+
+<!-- MAIN -->
+<div class="dashboard">
+  <h2 class="section-title">Recent Notifications</h2>
+  <div id="localNotificationSection"></div>
+  <h2 class="section-title" style="margin-top: 34px;">Complaint Status Overview</h2>
+  <div class="notification-list" id="notificationList"></div>
+</div>
+
+<!-- FOOTER -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+
+<script>
+if (localStorage.getItem("isLoggedIn") !== "true") {
+  window.location.href = "../../login.html";
+}
+
+const userMobile = localStorage.getItem("userMobile");
+
+function getStoredNotifications() {
+  return JSON.parse(localStorage.getItem("citizenNotifications")) || [];
+}
+
+function renderStoredNotifications() {
+  const container = document.getElementById("localNotificationSection");
+  const notifications = getStoredNotifications()
+    .filter(n => n.userMobile === userMobile)
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  container.innerHTML = "";
+
+  if (notifications.length === 0) {
+    container.innerHTML = `
+      <div class="notification-card">
+        <h3>Nothing new yet</h3>
+        <p>Updates from admin will appear here when a complaint status changes.</p>
+      </div>
+    `;
+    return;
+  }
+
+  notifications.forEach(n => {
+    container.innerHTML += `
+      <div class="notification-card ${n.read ? '' : 'unread'}" onclick="openDetails('${n.complaintId}')">
+        <h3>${n.type === 'success' ? '✅' : n.type === 'warning' ? '⚠️' : '🔔'} ${n.title}</h3>
+        <p>${n.message}</p>
+        <span class="time">${new Date(n.timestamp).toLocaleString()}</span>
+      </div>
+    `;
+  });
+}
+
+function loadNotifications() {
+  fetch("http://localhost:5000/api/complaints/all")
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("notificationList");
+      container.innerHTML = "";
+
+      const myComplaints = data.filter(c => c.user_mobile === userMobile);
+
+      if (myComplaints.length === 0) {
+        container.innerHTML = "<p>No status notifications available.</p>";
+        return;
+      }
+
+      myComplaints.forEach(c => {
+        let message = "";
+        let icon = "";
+
+        if (c.status === "Pending") {
+          icon = "⏳";
+          message = `Your complaint ${c.complaint_id} is still pending.`;
+        } else if (c.status === "In Progress") {
+          icon = "🛠";
+          message = `Work has started for complaint ${c.complaint_id}.`;
+        } else if (c.status === "Resolved") {
+          icon = "✅";
+          message = `Your complaint ${c.complaint_id} has been resolved successfully.`;
+        }
+
+        container.innerHTML += `
+          <div class="notification-card" onclick="openDetails('${c.complaint_id}')">
+            <h3>${icon} ${c.status}</h3>
+            <p>${message}</p>
+            <span class="time">${new Date(c.created_at).toLocaleString()}</span>
+          </div>
+        `;
+      });
+    })
+    .catch(err => {
+      console.error("Notification fetch error:", err);
+      const container = document.getElementById("notificationList");
+      const storedNotifications = getStoredNotifications().filter(n => n.userMobile === userMobile);
+      if (storedNotifications.length === 0) {
+        container.innerHTML = "<p style='color:#dc2626;'>Unable to load complaint status updates.</p>";
+      } else {
+        container.innerHTML = ""; // Hide error when user already has admin notifications
+      }
+    });
+}
+
+function openDetails(id) {
+  window.location.href = "complaint-details.html?id=" + id;
+}
+
+renderStoredNotifications();
+loadNotifications();
+
+// Auto refresh every 30 seconds
+setInterval(() => {
+  renderStoredNotifications();
+  loadNotifications();
+}, 30000);
+
+</script>
+
+</body>
+</html>

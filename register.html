@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>V-Connect | Citizen Registration</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="ui/css/base.css">
+  <link rel="stylesheet" href="ui/css/govt-theme.css">
+  <link rel="stylesheet" href="ui/css/layout.css">
+  <link rel="stylesheet" href="ui/css/responsive.css">
+<script src="./ui/js/translator.js"></script>
+</head>
+
+<body>
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- rest of your page -->
+
+<!-- TOP BAR -->
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>Citizen Registration</span>
+</div>
+
+<!-- ================= HEADER ================= -->
+<div class="header">
+  <img src="V-Connect.jpeg" class="main-logo">
+  <div>
+    <h1>V-Connect</h1>
+    <p>Citizen Services Portal</p>
+  </div>
+  <!-- Telangana + Rising Telangana -->
+  <img src="gov-logos.png" class="gov-logos">
+</div>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - Create New Account • VConnect - Create New Account • VConnect - Create New Account</span></div>
+  <h2>Create New Account</h2>
+  <p>Join the citizen grievance portal</p>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="login-box" style="margin: 0 auto; max-width: 500px; width: 100%;">
+    <h2>New Citizen Registration</h2>
+
+    <div class="login-form active">
+      <label>Full Name</label>
+      <input type="text" id="citizenName" placeholder="Enter your full name" required>
+
+      <label>Email Address</label>
+      <input type="email" id="userEmail" placeholder="Enter your email address" required>
+
+      <label>Mobile Number</label>
+      <input type="text" id="phoneNumber" placeholder="Enter mobile number" required>
+
+      <label>Village Name</label>
+      <input type="text" id="villageName" placeholder="Enter village">
+
+      <label>Mandal</label>
+      <input type="text" id="mandalName" placeholder="Enter mandal">
+
+      <label>Password</label>
+      <div class="password-field">
+        <input type="password" id="citizenPassword" placeholder="Create password" required>
+      </div>
+
+      <label>Confirm Password</label>
+      <div class="password-field">
+        <input type="password" id="citizenConfirmPassword" placeholder="Confirm password" required>
+      </div>
+
+      <button type="button" onclick="registerCitizen()" style="margin-top: 15px;">Register</button>
+
+      <p style="text-align:center; margin-top:20px;">
+        Already registered? <a href="login.html" style="color: var(--primary); font-weight: bold; text-decoration: none;">Login here</a>
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+
+</body>
+<script>
+  function registerCitizen() {
+    const name = document.getElementById("citizenName").value.trim();
+    const email = document.getElementById("userEmail").value.trim();
+    const mobile = document.getElementById("phoneNumber").value.trim();
+    const pwd = document.getElementById("citizenPassword").value.trim();
+    const confirmPwd = document.getElementById("citizenConfirmPassword").value.trim();
+    
+    // Ensure data exists
+    if(!name || !email || !mobile || !pwd || !confirmPwd) {
+      showToast("⚠️ Please fill in all required fields.", "warning");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showToast("❌ Please enter a valid email address.", "error");
+      return;
+    }
+
+    // Mobile validation (10-15 digits)
+    const normalizedMobile = mobile.replace(/\D/g, '');
+    if (!/^[0-9]{10,15}$/.test(normalizedMobile)) {
+      showToast("❌ Please enter a valid mobile number (10-15 digits).", "error");
+      return;
+    }
+
+    // Password Match Check
+    if(pwd !== confirmPwd) {
+      showToast("❌ Passwords do not match.", "error");
+      return;
+    }
+    
+    // Systemally Save Account Locally
+    localStorage.setItem("userName", name);
+    localStorage.setItem("userEmail", email);
+    localStorage.setItem("userMobile", normalizedMobile);
+    localStorage.setItem("userPassword", pwd);
+    
+    showToast("✅ Registration successful! Redirecting to login...", "success");
+    setTimeout(() => {
+      window.location.href = "login.html";
+    }, 1500);
+  }
+
+  function showToast(message, type = "success") {
+    const container = document.getElementById("toastContainer");
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<div class="toast-content"><span class="toast-message">${message}</span></div>`;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.animation = "toastOut 0.4s ease forwards";
+      setTimeout(() => toast.remove(), 400);
+    }, 3000);
+  }
+</script>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin | Citizens</title>
+
+  <link rel="stylesheet" href="../ui/css/base.css">
+  <link rel="stylesheet" href="../ui/css/layout.css">
+  <link rel="stylesheet" href="../ui/css/admin.css">
+<script src="../ui/js/translator.js"></script>
+</head>
+<body>
+
+<div class="header">
+  <img src="V-Connect.jpeg" height="50" class="main-logo">
+  <div>
+    <h2 style="margin:0;">V-Connect</h2>
+    <p style="margin:0;font-size:14px;">Registered Citizens</p>
+  </div>
+  <!-- Telangana + Rising Telangana -->
+  <img src="../gov-logos.png" class="gov-logos" style="margin-left:auto;">
+</div>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <h2>Registered Citizens</h2>
+  <p>View all citizens in the system</p>
+</div>
+
+<div class="admin-container">
+  <table class="admin-table" id="citizensTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Mobile</th>
+        <th>Village</th>
+        <th>Mandal</th>
+        <th>District</th>
+        <th>Total Complaints</th>
+        <th>Registered On</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+fetch("http://localhost:5000/api/admin/citizens")
+.then(res => res.json())
+.then(data => {
+
+  const tbody = document.querySelector("#citizensTable tbody");
+
+  if(data.length === 0){
+    tbody.innerHTML = "<tr><td colspan='7'>No citizens found</td></tr>";
+    return;
+  }
+
+  data.forEach(user => {
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${user.full_name || '-'}</td>
+        <td>${user.mobile}</td>
+        <td>${user.village || '-'}</td>
+        <td>${user.mandal || '-'}</td>
+        <td>${user.district || '-'}</td>
+        <td>
+          <span class="badge">${user.complaint_count}</span>
+        </td>
+        <td>${new Date(user.created_at).toLocaleDateString()}</td>
+      </tr>
+    `;
+  });
+});
+
+// ================= SMOOTH HOVER ALERT SYSTEM =================
+
+/**
+ * Create a hover alert for any element
+ * @param {string} selector - CSS selector for the element
+ * @param {string} message - Alert message
+ * @param {string} type - Alert type: 'info', 'success', 'warning', 'error'
+ */
+function addHoverAlert(selector, message, type = 'info') {
+  const elements = document.querySelectorAll(selector);
+  elements.forEach(element => {
+    // Skip if already has alert
+    if (element.querySelector('.alert-popup')) return;
+
+    // Create alert container
+    const alertContainer = document.createElement('div');
+    alertContainer.className = 'hover-alert';
+
+    // Create alert popup
+    const alertPopup = document.createElement('div');
+    alertPopup.className = `alert-popup ${type}`;
+    alertPopup.textContent = message;
+
+    // Wrap element if needed
+    if (element.parentNode.classList.contains('hover-alert')) return;
+
+    // Insert alert
+    element.parentNode.insertBefore(alertContainer, element);
+    alertContainer.appendChild(element);
+    alertContainer.appendChild(alertPopup);
+  });
+}
+
+// Initialize hover alerts on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Add hover alerts to table elements
+  setTimeout(() => {
+    addHoverAlert('th', 'Click to sort by this column', 'info');
+    addHoverAlert('td', 'Citizen information', 'info');
+    addHoverAlert('.badge', 'Total complaints filed by this citizen', 'warning');
+  }, 1000); // Wait for dynamic content to load
+});
+
+</script>
+
+<!-- FOOTER -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+</script>
+
+</body>
+</html>

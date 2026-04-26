@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>V-Connect | My Profile</title>
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/govt-theme.css">
+  <link rel="stylesheet" href="../css/layout.css">
+<script src="../../ui/js/translator.js"></script>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>Citizen Profile</span>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <img src="V-Connect.jpeg" alt="Logo" class="main-logo">
+  <div>
+    <h1>V-Connect</h1>
+    <p>Citizen Identity & Details</p>
+  </div>
+  <!-- Telangana + Rising Telangana -->
+  <img src="../../gov-logos.png" class="gov-logos">
+</div>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <a href="dashboard.html">Dashboard</a>
+  <a href="my-complaints.html">My Complaints</a>
+  <a href="notifications.html">Notifications</a>
+  <a href="../../login.html">Logout</a>
+</div>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - My Profile • VConnect - My Profile • VConnect - My Profile</span></div>
+  <h2>My Profile</h2>
+  <p>Manage your account details</p>
+</div>
+
+<!-- PROFILE FORM -->
+<div class="main">
+<form id="profileForm" class="login-box">
+
+<h2>My Profile</h2>
+
+<label>Full Name</label>
+<input type="text" id="fullName">
+
+<label>Mobile</label>
+<input type="text" id="mobile" readonly>
+
+<label>Village</label>
+<input type="text" id="village">
+
+<label>Mandal</label>
+<input type="text" id="mandal">
+
+<label>District</label>
+<input type="text" id="district">
+
+<label>Aadhaar Number</label>
+<input type="text" id="aadhaar" maxlength="12" placeholder="12-digit Aadhaar">
+
+<label>Profile Image</label>
+<input type="file" id="profileImage">
+<img id="previewImage" width="120" style="margin-top:10px;border-radius:8px;display:none;">
+
+<button type="button" onclick="sendOTP()">Verify & Update</button>
+
+<p style="font-size:12px;margin-top:10px;">
+⚠ OTP verification required before profile update
+</p>
+
+</form>
+</div>
+
+<!-- FOOTER -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+
+<script>
+
+if (localStorage.getItem("isLoggedIn") !== "true") {
+  window.location.href = "../../login.html";
+}
+
+const mobile = localStorage.getItem("userMobile");
+document.getElementById("mobile").value = mobile;
+
+let imageBase64 = "";
+
+/* ---------------- LOAD PROFILE ---------------- */
+
+fetch("http://localhost:5000/api/profile/" + mobile)
+.then(res => res.json())
+.then(data => {
+
+  document.getElementById("fullName").value = data.full_name || "";
+  document.getElementById("village").value = data.village || "";
+  document.getElementById("mandal").value = data.mandal || "";
+  document.getElementById("district").value = data.district || "";
+  document.getElementById("aadhaar").value = data.aadhaar || "";
+
+  if(data.profile_image){
+    document.getElementById("previewImage").src = data.profile_image;
+    document.getElementById("previewImage").style.display = "block";
+    imageBase64 = data.profile_image;
+  }
+});
+
+/* ---------------- IMAGE PREVIEW ---------------- */
+
+document.getElementById("profileImage").addEventListener("change", function(){
+  const reader = new FileReader();
+  reader.onload = function(){
+    imageBase64 = reader.result;
+    document.getElementById("previewImage").src = imageBase64;
+    document.getElementById("previewImage").style.display = "block";
+  };
+  reader.readAsDataURL(this.files[0]);
+});
+
+/* ---------------- OTP FLOW ---------------- */
+
+function sendOTP(){
+
+  const aadhaar = document.getElementById("aadhaar").value;
+
+  if(aadhaar.length !== 12){
+    alert("Enter valid 12-digit Aadhaar");
+    return;
+  }
+
+  fetch("http://localhost:5000/api/send-otp",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({mobile})
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    if(data.success){
+      const otp = prompt("Enter OTP sent to your mobile:");
+      verifyOTP(otp);
+    }
+  });
+}
+
+function verifyOTP(otp){
+
+  fetch("http://localhost:5000/api/verify-otp",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({mobile, otp})
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    if(data.verified){
+      updateProfile();
+    }else{
+      alert("Invalid OTP");
+    }
+  });
+}
+
+/* ---------------- UPDATE PROFILE ---------------- */
+
+function updateProfile(){
+
+  const profileData = {
+    full_name: document.getElementById("fullName").value,
+    mobile: mobile,
+    village: document.getElementById("village").value,
+    mandal: document.getElementById("mandal").value,
+    district: document.getElementById("district").value,
+    aadhaar: document.getElementById("aadhaar").value,
+    profile_image: imageBase64
+  };
+
+  fetch("http://localhost:5000/api/update-profile",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify(profileData)
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    alert("✅ Profile Updated Successfully");
+  });
+}
+
+</script>
+
+</body>
+</html>

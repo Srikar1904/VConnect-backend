@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-Connect - Firebase Integration Examples</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .examples-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+        }
+        .example-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .example-card h2 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        .example-card h3 {
+            color: #333;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        pre {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        code {
+            color: #d63384;
+        }
+        .note {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+    </style>
+<script src="./ui/js/translator.js"></script>
+</head>
+<body>
+    <h1>V-Connect Firebase Integration Examples</h1>
+    
+    <div class="examples-container">
+        <!-- Example 1: Register with OTP -->
+        <div class="example-card">
+            <h2>1. Register with OTP</h2>
+            <p>Integration for register.html</p>
+            
+            <h3>HTML Structure</h3>
+            <pre><code>&lt;form id="registerForm"&gt;
+  &lt;input type="text" 
+         id="fullName" 
+         placeholder="Full Name" 
+         required&gt;
+  
+  &lt;input type="tel" 
+         id="phoneNumber" 
+         placeholder="+919876543210" 
+         required&gt;
+  
+  &lt;input type="email" 
+         id="email" 
+         placeholder="Email" 
+         required&gt;
+  
+  &lt;input type="password" 
+         id="password" 
+         placeholder="Password" 
+         required&gt;
+  
+  &lt;button type="button" 
+          onclick="sendRegisterOTP()"&gt;
+    Send OTP
+  &lt;/button&gt;
+&lt;/form&gt;
+
+&lt;div id="otpSection" style="display:none;"&gt;
+  &lt;input type="text" 
+         id="otpCode" 
+         placeholder="123456" 
+         maxlength="6"&gt;
+  
+  &lt;button type="button" 
+          onclick="verifyRegisterOTP()"&gt;
+    Verify OTP
+  &lt;/button&gt;
+  
+  &lt;div id="otpMessage"&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+            <h3>JavaScript Implementation</h3>
+            <pre><code>// Send OTP for registration
+async function sendRegisterOTP() {
+  const phoneNumber = document.getElementById('phoneNumber').value;
+  const email = document.getElementById('email').value;
+  
+  if (!phoneNumber || !email) {
+    alert('Please enter phone and email');
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phoneNumber, email })
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      document.getElementById('otpSection').style.display = 'block';
+      document.getElementById('otpCode').focus();
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// Verify OTP for registration
+async function verifyRegisterOTP() {
+  const phoneNumber = document.getElementById('phoneNumber').value;
+  const otp = document.getElementById('otpCode').value;
+  
+  try {
+    const response = await fetch('/api/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phoneNumber, otp })
+    });
+    
+    const data = await response.json();
+    if (data.verified) {
+      // Register user
+      registerUser();
+    } else {
+      document.getElementById('otpMessage').textContent = 
+        '❌ ' + data.message;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// Save user to database after OTP verification
+async function registerUser() {
+  const userData = {
+    full_name: document.getElementById('fullName').value,
+    mobile: document.getElementById('phoneNumber').value,
+    email: document.getElementById('email').value,
+    password: document.getElementById('password').value,
+    role: 'citizen'
+  };
+  
+  try {
+    const response = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      alert('Registration successful!');
+      window.location.href = '/login.html';
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}</code></pre>
+
+            <div class="note">
+                <strong>Note:</strong> After OTP verification, save user to database with encrypted password.
+            </div>
+        </div>
+
+        <!-- Example 2: Login with OTP -->
+        <div class="example-card">
+            <h2>2. Login with OTP</h2>
+            <p>Integration for login.html (Alternative to password)</p>
+            
+            <h3>HTML Structure</h3>
+            <pre><code>&lt;div class="login-options"&gt;
+  &lt;!-- Option 1: Password Login --&gt;
+  &lt;div id="passwordLogin"&gt;
+    &lt;input type="tel" 
+           id="loginPhone" 
+           placeholder="+919876543210"&gt;
+    &lt;input type="password" 
+           id="password" 
+           placeholder="Password"&gt;
+    &lt;button onclick="loginWithPassword()"&gt;
+      Login
+    &lt;/button&gt;
+  &lt;/div&gt;
+  
+  &lt;hr&gt;
+  &lt;p&gt;Or login with OTP&lt;/p&gt;
+  
+  &lt;!-- Option 2: OTP Login --&gt;
+  &lt;div id="otpLogin"&gt;
+    &lt;input type="tel" 
+           id="otpPhone" 
+           placeholder="+919876543210"&gt;
+    &lt;button onclick="sendLoginOTP()"&gt;
+      Send OTP
+    &lt;/button&gt;
+  &lt;/div&gt;
+  
+  &lt;div id="otpVerifySection" style="display:none;"&gt;
+    &lt;input type="text" 
+           id="loginOtp" 
+           placeholder="123456" 
+           maxlength="6"&gt;
+    &lt;button onclick="verifyLoginOTP()"&gt;
+      Verify OTP
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+            <h3>JavaScript Implementation</h3>
+            <pre><code>// Send OTP for login
+async function sendLoginOTP() {
+  const phoneNumber = document.getElementById('otpPhone').value;
+  
+  if (!phoneNumber) {
+    alert('Please enter phone number');
+    return;
+  }
+  
+  const response = await fetch('/api/send-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      phoneNumber, 
+      email: phoneNumber + '@vconnect.local' 
+    })
+  });
+  
+  if (response.ok) {
+    document.getElementById('otpVerifySection').style.display = 'block';
+    document.getElementById('loginOtp').focus();
+  }
+}
+
+// Verify OTP and login
+async function verifyLoginOTP() {
+  const phoneNumber = document.getElementById('otpPhone').value;
+  const otp = document.getElementById('loginOtp').value;
+  
+  const verifyResponse = await fetch('/api/verify-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phoneNumber, otp })
+  });
+  
+  const verifyData = await verifyResponse.json();
+  if (verifyData.verified) {
+    // Login user
+    const loginResponse = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        mobile: phoneNumber,
+        password: 'otp_authenticated' 
+      })
+    });
+    
+    const loginData = await loginResponse.json();
+    if (loginData.success) {
+      // Store user session
+      sessionStorage.setItem('user', JSON.stringify({
+        mobile: phoneNumber,
+        role: loginData.role
+      }));
+      window.location.href = '/dashboard.html';
+    }
+  }
+}</code></pre>
+
+            <div class="warning">
+                <strong>Security:</strong> Implement server-side session management for security.
+            </div>
+        </div>
+
+        <!-- Example 3: Profile Update with OTP -->
+        <div class="example-card">
+            <h2>3. Profile Update with OTP</h2>
+            <p>Integration for profile.html</p>
+            
+            <h3>HTML Structure</h3>
+            <pre><code>&lt;form id="profileForm"&gt;
+  &lt;input type="text" id="fullName" placeholder="Full Name"&gt;
+  &lt;input type="tel" id="phone" placeholder="Phone"&gt;
+  &lt;input type="email" id="email" placeholder="Email"&gt;
+  &lt;input type="text" id="village" placeholder="Village"&gt;
+  &lt;input type="text" id="mandal" placeholder="Mandal"&gt;
+  &lt;input type="text" id="district" placeholder="District"&gt;
+  &lt;input type="text" id="aadhaar" placeholder="Aadhaar"&gt;
+  
+  &lt;button type="button" onclick="requestProfileUpdateOTP()"&gt;
+    Update Profile
+  &lt;/button&gt;
+&lt;/form&gt;
+
+&lt;div id="otpVerification" style="display:none;"&gt;
+  &lt;label&gt;Enter OTP sent to your email&lt;/label&gt;
+  &lt;input type="text" 
+         id="profileOtp" 
+         placeholder="123456" 
+         maxlength="6"&gt;
+  &lt;button type="button" onclick="confirmProfileUpdate()"&gt;
+    Verify & Update
+  &lt;/button&gt;
+&lt;/div&gt;</code></pre>
+
+            <h3>JavaScript Implementation</h3>
+            <pre><code>// Request OTP for profile update
+async function requestProfileUpdateOTP() {
+  const phone = document.getElementById('phone').value;
+  const email = document.getElementById('email').value;
+  
+  const response = await fetch('/api/send-profile-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      phoneNumber: phone, 
+      email 
+    })
+  });
+  
+  if (response.ok) {
+    document.getElementById('otpVerification').style.display = 'block';
+    document.getElementById('profileOtp').focus();
+  }
+}
+
+// Confirm and update profile
+async function confirmProfileUpdate() {
+  const otp = document.getElementById('profileOtp').value;
+  const phone = document.getElementById('phone').value;
+  
+  // Verify OTP
+  const verifyResponse = await fetch('/api/verify-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phoneNumber: phone, otp })
+  });
+  
+  const verifyData = await verifyResponse.json();
+  if (!verifyData.verified) {
+    alert('Invalid OTP: ' + verifyData.message);
+    return;
+  }
+  
+  // Update profile
+  const updateResponse = await fetch('/api/update-profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      mobile: phone,
+      full_name: document.getElementById('fullName').value,
+      village: document.getElementById('village').value,
+      mandal: document.getElementById('mandal').value,
+      district: document.getElementById('district').value,
+      aadhaar: document.getElementById('aadhaar').value,
+      profile_image: ''
+    })
+  });
+  
+  const updateData = await updateResponse.json();
+  if (updateData.success) {
+    alert('Profile updated successfully!');
+    document.getElementById('otpVerification').style.display = 'none';
+  }
+}</code></pre>
+
+            <div class="note">
+                <strong>Tip:</strong> Always verify OTP before making sensitive changes like profile updates.
+            </div>
+        </div>
+
+        <!-- Example 4: Email Verification -->
+        <div class="example-card">
+            <h2>4. Email Verification</h2>
+            <p>Verify email with OTP</p>
+            
+            <h3>HTML Structure</h3>
+            <pre><code>&lt;div id="emailVerification"&gt;
+  &lt;p&gt;Verify your email address&lt;/p&gt;
+  &lt;input type="email" 
+         id="verifyEmail" 
+         placeholder="user@example.com"&gt;
+  
+  &lt;button onclick="sendEmailVerificationOTP()"&gt;
+    Send Verification Code
+  &lt;/button&gt;
+  
+  &lt;div id="verifyCodeInput" style="display:none;"&gt;
+    &lt;input type="text" 
+           id="verifyCode" 
+           placeholder="123456" 
+           maxlength="6"&gt;
+    &lt;button onclick="verifyEmailOTP()"&gt;
+      Verify Email
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+            <h3>JavaScript Implementation</h3>
+            <pre><code>async function sendEmailVerificationOTP() {
+  const email = document.getElementById('verifyEmail').value;
+  
+  const response = await fetch('/api/send-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, phoneNumber: email })
+  });
+  
+  if (response.ok) {
+    document.getElementById('verifyCodeInput').style.display = 'block';
+  }
+}
+
+async function verifyEmailOTP() {
+  const email = document.getElementById('verifyEmail').value;
+  const code = document.getElementById('verifyCode').value;
+  
+  const response = await fetch('/api/verify-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      phoneNumber: email, 
+      otp: code 
+    })
+  });
+  
+  const data = await response.json();
+  if (data.verified) {
+    alert('Email verified!');
+    // Update user record to mark email as verified
+  }
+}</code></pre>
+        </div>
+
+        <!-- Example 5: Resend OTP -->
+        <div class="example-card">
+            <h2>5. Resend OTP Handler</h2>
+            <p>Handle OTP resend with cooldown</p>
+            
+            <h3>JavaScript Implementation</h3>
+            <pre><code>let otpResendCooldown = 0;
+
+async function resendOTP() {
+  if (otpResendCooldown > 0) {
+    alert(`Please wait ${otpResendCooldown}s before resending`);
+    return;
+  }
+  
+  // Send OTP
+  await generateOTP();
+  
+  // Start cooldown (60 seconds)
+  otpResendCooldown = 60;
+  document.getElementById('resendBtn').disabled = true;
+  
+  const timer = setInterval(() => {
+    otpResendCooldown--;
+    document.getElementById('resendBtn').textContent = 
+      `Resend in ${otpResendCooldown}s`;
+    
+    if (otpResendCooldown === 0) {
+      clearInterval(timer);
+      document.getElementById('resendBtn').disabled = false;
+      document.getElementById('resendBtn').textContent = 'Resend OTP';
+    }
+  }, 1000);
+}</code></pre>
+        </div>
+
+        <!-- Example 6: Error Handling -->
+        <div class="example-card">
+            <h2>6. Error Handling</h2>
+            <p>Proper error handling patterns</p>
+            
+            <h3>JavaScript Implementation</h3>
+            <pre><code>async function handleOTPWithErrorHandling() {
+  try {
+    // Validate input
+    const phone = document.getElementById('phone').value;
+    if (!validatePhoneNumber(phone)) {
+      throw new Error('Invalid phone number format');
+    }
+    
+    // Send OTP
+    const response = await fetch('/api/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phoneNumber: phone })
+    });
+    
+    // Check response status
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showSuccessMessage('OTP sent successfully');
+    } else {
+      throw new Error(data.error || 'Failed to send OTP');
+    }
+    
+  } catch (error) {
+    console.error('Error:', error);
+    showErrorMessage(error.message);
+  }
+}
+
+function validatePhoneNumber(phone) {
+  // Validate +country code format
+  return /^\+\d{1,3}\d{6,14}$/.test(phone);
+}
+
+function showErrorMessage(message) {
+  const errorDiv = document.getElementById('errorMessage');
+  errorDiv.textContent = '❌ ' + message;
+  errorDiv.style.display = 'block';
+  setTimeout(() => errorDiv.style.display = 'none', 5000);
+}
+
+function showSuccessMessage(message) {
+  const successDiv = document.getElementById('successMessage');
+  successDiv.textContent = '✅ ' + message;
+  successDiv.style.display = 'block';
+}</code></pre>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px; background: #f0f0f0; padding: 20px; border-radius: 8px;">
+        <h2>Integration Checklist</h2>
+        <ul>
+            <li>✅ Include firebase-config.js in your HTML files</li>
+            <li>✅ Configure Firebase credentials in firebase-config.js</li>
+            <li>✅ Set up .env file with email configuration</li>
+            <li>✅ Test each OTP flow before deployment</li>
+            <li>✅ Implement error handling</li>
+            <li>✅ Add loading indicators</li>
+            <li>✅ Set OTP input to maxlength="6"</li>
+            <li>✅ Store user session after verification</li>
+            <li>✅ Validate phone number format</li>
+            <li>✅ Implement rate limiting on frontend</li>
+        </ul>
+    </div>
+</body>
+</html>

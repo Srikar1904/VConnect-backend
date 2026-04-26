@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>V-Connect | Report a Problem</title>
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/govt-theme.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+
+  <style>
+    .image-upload-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .camera-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .camera-btn:hover {
+      background: var(--secondary);
+      transform: translateY(-1px);
+    }
+
+    .capture-btn, .retake-btn, .close-camera-btn, .use-image-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+
+    .use-image-btn {
+      background: var(--primary);
+    }
+
+    .use-image-btn:hover {
+      background: var(--secondary);
+    }
+
+    .capture-btn:hover, .retake-btn:hover {
+      background: #16a34a;
+      transform: translateY(-1px);
+    }
+
+    .close-camera-btn {
+      background: #dc2626;
+    }
+
+    .close-camera-btn:hover {
+      background: #b91c1c;
+    }
+
+    @media (max-width: 768px) {
+      .image-upload-section {
+        flex-direction: column;
+      }
+
+      .camera-btn {
+        width: 100%;
+      }
+    }
+  </style>
+<script src="../../ui/js/translator.js"></script>
+</head>
+
+<body>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- TOP BAR -->
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>Report Local Problem</span>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <img src="V-Connect.jpeg" alt="Logo" class="main-logo">
+  <div>
+    <h1>V-Connect</h1>
+    <p>Report Village Problems with Transparency</p>
+  </div>
+  <!-- Telangana + Rising Telangana -->
+  <img src="../../gov-logos.png" class="gov-logos">
+</div>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <a href="dashboard.html">Dashboard</a>
+  <a href="my-complaints.html">My Complaints</a>
+  <a href="profile.html">Profile</a>
+  <a href="../../login.html" onclick="logout()">Logout</a>
+</div>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - Report a Problem • VConnect - Report a Problem • VConnect - Report a Problem</span></div>
+
+  <h2>Report a Problem</h2>
+  <p>Help us improve your village</p>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- INSTRUCTIONS -->
+  <div class="info-box">
+    <h2>Instructions</h2>
+    <ul>
+      <li>📸 Upload a clear image of the problem</li>
+      <li>📍 Enter exact street or landmark</li>
+      <li>📅 Date & time are auto recorded</li>
+      <li>🔔 You will be notified after submission</li>
+    </ul>
+  </div>
+
+  <!-- REPORT FORM -->
+  <div class="login-box">
+    <h2>Report a Problem</h2>
+
+    <label>Problem Image</label>
+    <div class="image-upload-section">
+      <input type="file" id="problemImage" accept="image/*" style="margin-bottom: 10px;">
+      <button type="button" id="cameraBtn" class="camera-btn">📷 Take Photo</button>
+    </div>
+
+    <!-- Camera Interface -->
+    <div id="cameraInterface" style="display: none; margin-bottom: 12px;">
+      <video id="cameraPreview" autoplay playsinline style="width: 100%; border-radius: 14px; margin-bottom: 10px;"></video>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button type="button" id="captureBtn" class="capture-btn">📸 Capture</button>
+        <button type="button" id="closeCameraBtn" class="close-camera-btn">❌ Close</button>
+      </div>
+    </div>
+
+    <!-- Captured Image Review -->
+    <div id="imageReview" style="display: none; margin-bottom: 12px;">
+      <div style="text-align: center; margin-bottom: 10px;">
+        <h4 style="color: var(--primary); margin: 0;">Captured Image</h4>
+        <p style="color: #666; font-size: 14px; margin: 5px 0;">Is this image clear and shows the problem well?</p>
+      </div>
+      <img id="reviewImg" style="width: 100%; border-radius: 14px; border: 2px solid var(--primary); margin-bottom: 10px;">
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button type="button" id="useImageBtn" class="use-image-btn">✅ Use This Image</button>
+        <button type="button" id="retakeBtn" class="retake-btn">🔄 Retake Photo</button>
+      </div>
+    </div>
+
+    <div id="imagePreview" style="display:none; margin-bottom:12px;">
+      <img id="previewImg" style="width:100%; border-radius:14px;">
+    </div>
+
+    <label>Problem Type</label>
+    <select id="problemType">
+      <option value="">-- Select Problem Type --</option>
+      <option>Road Damage</option>
+      <option>Drainage Issue</option>
+      <option>Garbage Problem</option>
+      <option>Street Light Not Working</option>
+      <option>Water Supply Issue</option>
+      <option>Other</option>
+    </select>
+
+    <label>Location / Landmark</label>
+    <input type="text" id="location" placeholder="Street name or landmark">
+
+    <label>Date & Time</label>
+    <input type="text" id="dateTime" readonly>
+
+    <label>Problem Description</label>
+    <textarea id="description" rows="4"
+      placeholder="Describe the issue briefly"></textarea>
+
+    <button type="button" id="submitBtn">Submit Complaint</button>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+// Camera and photo capture variables
+let stream = null;
+let capturedImageData = null;
+
+/* AUTH CHECK */
+if (localStorage.getItem("isLoggedIn") !== "true") {
+  window.location.href = "../../login.html";
+}
+
+/* CAMERA FUNCTIONALITY */
+document.getElementById("cameraBtn").addEventListener("click", openCamera);
+document.getElementById("captureBtn").addEventListener("click", capturePhoto);
+document.getElementById("retakeBtn").addEventListener("click", retakePhoto);
+document.getElementById("closeCameraBtn").addEventListener("click", closeCamera);
+document.getElementById("useImageBtn").addEventListener("click", useCapturedImage);
+
+async function openCamera() {
+  try {
+    // Request camera access
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment' }, // Use back camera on mobile
+      audio: false
+    });
+
+    const video = document.getElementById("cameraPreview");
+    video.srcObject = stream;
+
+    // Show camera interface
+    document.getElementById("cameraInterface").style.display = "block";
+    document.getElementById("cameraBtn").style.display = "none";
+    document.getElementById("problemImage").style.display = "none";
+
+  } catch (error) {
+    console.error("Camera access denied:", error);
+    alert("Camera access is required to take photos. Please allow camera permissions.");
+  }
+}
+
+function capturePhoto() {
+  const video = document.getElementById("cameraPreview");
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  // Set canvas size to video dimensions
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  // Draw video frame to canvas
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  // Convert to data URL
+  capturedImageData = canvas.toDataURL("image/jpeg", 0.8);
+
+  // Show review interface
+  const reviewImg = document.getElementById("reviewImg");
+  reviewImg.src = capturedImageData;
+  document.getElementById("imageReview").style.display = "block";
+
+  // Hide camera interface
+  document.getElementById("cameraInterface").style.display = "none";
+
+  // Stop camera stream
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+  }
+}
+
+function useCapturedImage() {
+  // Move captured image to final preview
+  const previewImg = document.getElementById("previewImg");
+  previewImg.src = capturedImageData;
+  document.getElementById("imagePreview").style.display = "block";
+
+  // Hide review interface
+  document.getElementById("imageReview").style.display = "none";
+
+  // Reset camera interface
+  document.getElementById("cameraBtn").style.display = "inline-block";
+  document.getElementById("problemImage").style.display = "block";
+}
+
+function retakePhoto() {
+  // Hide review interface
+  document.getElementById("imageReview").style.display = "none";
+
+  // Reopen camera
+  openCamera();
+}
+
+function closeCamera() {
+  // Stop camera stream
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+  }
+
+  // Reset UI - hide all camera related interfaces
+  document.getElementById("cameraInterface").style.display = "none";
+  document.getElementById("imageReview").style.display = "none";
+  document.getElementById("cameraBtn").style.display = "inline-block";
+  document.getElementById("problemImage").style.display = "block";
+}
+
+/* AUTO DATE & TIME */
+document.getElementById("dateTime").value =
+  new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString();
+
+/* IMAGE PREVIEW - File Upload */
+document.getElementById("problemImage").addEventListener("change", function (e) {
+  if (e.target.files.length > 0) {
+    const img = document.getElementById("previewImg");
+    img.src = URL.createObjectURL(e.target.files[0]);
+    document.getElementById("imagePreview").style.display = "block";
+    capturedImageData = null; // Reset camera capture
+    // Hide review interface if visible
+    document.getElementById("imageReview").style.display = "none";
+  }
+});
+
+/* LOGOUT */
+function logout() {
+  localStorage.clear();
+}
+
+/* SUBMIT HANDLER */
+document.getElementById("submitBtn").addEventListener("click", submitComplaint);
+
+function submitComplaint() {
+  console.log("✅ Submit clicked");
+
+  const type = document.getElementById("problemType").value;
+  const location = document.getElementById("location").value.trim();
+  const desc = document.getElementById("description").value.trim();
+  const imageInput = document.getElementById("problemImage");
+
+  // Check if image is provided (either uploaded or captured)
+  if (!type || !location || !desc || (!imageInput.files.length && !capturedImageData)) {
+    alert("Please fill all fields and provide an image (upload or capture)");
+    return;
+  }
+
+  // Use captured image if available, otherwise use uploaded file
+  if (capturedImageData) {
+    // Use captured image data directly
+    submitWithImageData(capturedImageData);
+  } else {
+    // Use uploaded file
+    const reader = new FileReader();
+    reader.onload = function () {
+      submitWithImageData(reader.result);
+    };
+    reader.readAsDataURL(imageInput.files[0]);
+  }
+}
+
+function submitWithImageData(imageData) {
+  const type = document.getElementById("problemType").value;
+  const location = document.getElementById("location").value.trim();
+  const desc = document.getElementById("description").value.trim();
+
+  const userMobile = localStorage.getItem("userMobile") || "9999999999";
+  console.log("Submitting complaint for user:", userMobile);
+
+  const payload = {
+    complaint_id: "VC-" + Date.now(),
+    user_mobile: userMobile,
+    type,
+    location,
+    description: desc,
+    image: imageData
+  };
+
+  console.log("📤 Sending:", payload);
+
+  fetch("http://localhost:5000/api/complaints/add", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("✅ Backend response:", data);
+    if (data.success) {
+      showToast("✅ Complaint submitted successfully!", "success");
+      setTimeout(() => {
+        window.location.href = "my-complaints.html";
+      }, 1500);
+    } else {
+      showToast("❌ Failed to submit complaint", "error");
+    }
+  })
+  .catch(err => {
+    console.error("❌ Error:", err);
+    showToast("❌ Server error. Please try again.", "error");
+  });
+}
+
+// Toast notification function
+function showToast(message, type = "info") {
+  // Remove existing toasts
+  const existingToasts = document.querySelectorAll(".toast-notification");
+  existingToasts.forEach(toast => toast.remove());
+
+  // Create toast element
+  const toast = document.createElement("div");
+  toast.className = `toast-notification toast-${type}`;
+  toast.innerHTML = `
+    <div class="toast-content">
+      <span class="toast-message">${message}</span>
+      <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
+    </div>
+  `;
+
+  // Add to page
+  document.body.appendChild(toast);
+
+  // Trigger animation
+  setTimeout(() => toast.classList.add("show"), 10);
+
+  // Auto dismiss after 4 seconds
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+</script>
+
+</body>
+</html>

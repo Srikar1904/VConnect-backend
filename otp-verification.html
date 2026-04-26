@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>V-Connect | OTP Verification</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="ui/css/base.css">
+  <link rel="stylesheet" href="ui/css/govt-theme.css">
+  <link rel="stylesheet" href="ui/css/layout.css">
+  <link rel="stylesheet" href="ui/css/responsive.css">
+<script src="./ui/js/translator.js"></script>
+</head>
+
+<body>
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- rest of your page -->
+
+<!-- TOP BAR -->
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>OTP Verification</span>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <img src="V-Connect.jpeg" alt="V-Connect Logo" class="main-logo">
+  <div>
+    <h1>V-Connect</h1>
+    <p>Secure Account Verification</p>
+  </div>
+  <!-- Telangana + Rising Telangana -->
+  <img src="gov-logos.png" class="gov-logos">
+</div>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - Verify Your Identity • VConnect - Verify Your Identity • VConnect - Verify Your Identity</span></div>
+  <h2>Verify Your Identity</h2>
+  <p>Enter the OTP sent to your device</p>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="login-box" style="margin:auto; max-width:420px; text-align:center;">
+    <h2>Verify OTP</h2>
+
+    <p style="font-size:14px; color:#64748b;">
+      Enter the <strong>6-digit OTP</strong> sent to your registered
+      mobile number or email.
+    </p>
+
+    <form onsubmit="verifyOTP(event)">
+
+      <div class="otp-container">
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" required>
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" required>
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" required>
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" required>
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" required>
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" required>
+      </div>
+
+      <button type="submit">Verify OTP</button>
+    </form>
+
+    <p style="margin-top:14px; font-size:14px;">
+      Didn’t receive OTP?
+      <a href="#" onclick="resendOTP()">Resend</a>
+    </p>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+
+<!-- SCRIPT -->
+<script>
+  const API_URL = 'http://localhost:5000';
+
+  // ================= TOAST NOTIFICATION SYSTEM =================
+
+  /**
+   * Show a toast notification
+   * @param {string} message - The message to display
+   * @param {string} type - Type: 'success', 'error', 'warning', 'loading'
+   * @param {number} duration - Duration in milliseconds (default: 4000)
+   */
+  function showToast(message, type = 'success', duration = 4000) {
+    const toastContainer = document.getElementById('toastContainer');
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    // Create content
+    const content = document.createElement('div');
+    content.className = 'toast-content';
+
+    // Add icon based on type
+    const icon = document.createElement('span');
+    icon.style.fontSize = '18px';
+    switch(type) {
+      case 'success': icon.textContent = '✅'; break;
+      case 'error': icon.textContent = '❌'; break;
+      case 'warning': icon.textContent = '⚠️'; break;
+      case 'loading':
+        const spinner = document.createElement('div');
+        spinner.className = 'toast-spinner';
+        content.appendChild(spinner);
+        break;
+      default: icon.textContent = 'ℹ️';
+    }
+
+    if (type !== 'loading') {
+      content.appendChild(icon);
+    }
+
+    // Add message
+    const text = document.createElement('span');
+    text.textContent = message;
+    content.appendChild(text);
+
+    // Add close button
+    const closeBtn = document.createElement('span');
+    closeBtn.className = 'toast-close';
+    closeBtn.textContent = '✕';
+    closeBtn.onclick = () => removeToast(toast);
+
+    // Assemble toast
+    toast.appendChild(content);
+    toast.appendChild(closeBtn);
+    toastContainer.appendChild(toast);
+
+    // Add hover effects
+    toast.addEventListener('mouseenter', () => {
+      toast.style.transform = 'translateX(0) scale(1.02)';
+      toast.style.boxShadow = '0 20px 45px rgba(0,0,0,0.3)';
+    });
+
+    toast.addEventListener('mouseleave', () => {
+      toast.style.transform = 'translateX(0) scale(1)';
+      toast.style.boxShadow = '0 18px 40px rgba(0,0,0,0.25)';
+    });
+
+    // Auto remove after duration
+    if (duration > 0) {
+      setTimeout(() => {
+        if (toast.parentNode) {
+          removeToast(toast);
+        }
+      }, duration);
+    }
+
+    return toast;
+  }
+
+  function removeToast(toast) {
+    toast.style.animation = 'toastOut 0.3s ease forwards';
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }
+
+  // Check if user came from forgot password page
+  window.addEventListener('DOMContentLoaded', function() {
+    const userContact = sessionStorage.getItem('userContact');
+    console.log('OTP page loaded, userContact from sessionStorage:', userContact);
+
+    if (!userContact) {
+      showToast("Session expired. Please start from the forgot password page.", "error");
+      setTimeout(() => {
+        window.location.href = "forgot-password.html";
+      }, 2000);
+      return;
+    }
+
+    // Show which contact the OTP was sent to
+    const contactDisplay = document.createElement('p');
+    contactDisplay.style.cssText = 'font-size: 14px; color: #64748b; text-align: center; margin-bottom: 20px;';
+    contactDisplay.textContent = `OTP sent to: ${userContact}`;
+    document.querySelector('h2').insertAdjacentElement('afterend', contactDisplay);
+
+    // Initialize OTP input handling
+    initializeOTPInputs();
+  });
+
+  function initializeOTPInputs() {
+    const otpInputs = document.querySelectorAll('.otp-input');
+
+    otpInputs.forEach((input, index) => {
+      // Handle input
+      input.addEventListener('input', (e) => {
+        const value = e.target.value;
+
+        // Only allow numbers
+        if (!/^\d*$/.test(value)) {
+          e.target.value = '';
+          return;
+        }
+
+        // Add filled class
+        if (value) {
+          e.target.classList.add('filled');
+        } else {
+          e.target.classList.remove('filled');
+        }
+
+        // Auto-focus next input
+        if (value && index < otpInputs.length - 1) {
+          otpInputs[index + 1].focus();
+        }
+      });
+
+      // Handle backspace
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+          otpInputs[index - 1].focus();
+        }
+      });
+
+      // Handle paste
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const paste = (e.clipboardData || window.clipboardData).getData('text');
+        const pasteNumbers = paste.replace(/\D/g, '').slice(0, 6);
+
+        pasteNumbers.split('').forEach((num, i) => {
+          if (otpInputs[index + i]) {
+            otpInputs[index + i].value = num;
+            otpInputs[index + i].classList.add('filled');
+          }
+        });
+
+        // Focus the next empty input or the last input
+        const nextEmptyIndex = Array.from(otpInputs).findIndex((input, i) => i >= index && !input.value);
+        if (nextEmptyIndex !== -1) {
+          otpInputs[nextEmptyIndex].focus();
+        } else {
+          otpInputs[otpInputs.length - 1].focus();
+        }
+      });
+    });
+  }
+
+  function getOTPValue() {
+    const otpInputs = document.querySelectorAll('.otp-input');
+    let otp = '';
+    otpInputs.forEach(input => {
+      otp += input.value;
+    });
+    return otp;
+  }
+
+  function clearOTPError() {
+    const otpInputs = document.querySelectorAll('.otp-input');
+    otpInputs.forEach(input => {
+      input.classList.remove('error');
+    });
+  }
+
+  async function verifyOTP(event) {
+    if (event) {
+      event.preventDefault();
+    }
+
+    const otp = getOTPValue();
+    const userContact = sessionStorage.getItem('userContact');
+
+    console.log('Verifying OTP for:', userContact, 'OTP:', otp);
+
+    // Clear any previous errors
+    clearOTPError();
+
+    if (!userContact) {
+      showToast("Session expired. Please start from the beginning.", "error");
+      setTimeout(() => {
+        window.location.href = "forgot-password.html";
+      }, 2000);
+      return false;
+    }
+
+    if (otp.length !== 6) {
+      // Add error styling to empty inputs
+      const otpInputs = document.querySelectorAll('.otp-input');
+      otpInputs.forEach(input => {
+        if (!input.value) {
+          input.classList.add('error');
+        }
+      });
+      showToast("Please enter all 6 digits of the OTP", "error");
+      return false;
+    }
+
+    // Show loading toast
+    const loadingToast = showToast("Verifying OTP...", "loading", 0);
+
+    try {
+      const response = await fetch(API_URL + '/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: userContact, otp: otp })
+      });
+
+      const data = await response.json();
+      console.log('OTP verification response:', data);
+
+      // Remove loading toast
+      removeToast(loadingToast);
+      
+      if (data.verified) {
+        showToast("OTP verified successfully!", "success");
+        // Store verification status
+        sessionStorage.setItem('otpVerified', 'true');
+        // Redirect after a short delay to let user see the success message
+        setTimeout(() => {
+          window.location.href = "reset-password.html";
+        }, 1500);
+      } else {
+        // Add error styling to all inputs
+        const otpInputs = document.querySelectorAll('.otp-input');
+        otpInputs.forEach(input => {
+          input.classList.add('error');
+        });
+        showToast('Error: ' + (data.message || 'Invalid OTP'), 'error');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Remove loading toast
+      removeToast(loadingToast);
+      showToast('Error verifying OTP. Please try again. Make sure backend server is running.', 'error');
+    }
+
+    return false;
+  }
+
+  async function resendOTP() {
+    const userContact = sessionStorage.getItem('userContact');
+    
+    if (!userContact) {
+      showToast("Session expired. Please start from the beginning.", "error");
+      setTimeout(() => {
+        window.location.href = "forgot-password.html";
+      }, 2000);
+      return;
+    }
+
+    // Show loading toast
+    const loadingToast = showToast("Resending OTP...", "loading", 0);
+
+    try {
+      const response = await fetch(API_URL + '/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: userContact })
+      });
+
+      const data = await response.json();
+
+      // Remove loading toast
+      removeToast(loadingToast);
+      
+      if (data.success) {
+        showToast('A new OTP has been sent to ' + userContact + '!', 'success');
+      } else {
+        showToast('Error: ' + (data.message || 'Failed to resend OTP'), 'error');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Remove loading toast
+      removeToast(loadingToast);
+      showToast('Error resending OTP. Please try again.', 'error');
+    }
+  }
+
+// ================= SMOOTH HOVER ALERT SYSTEM =================
+
+/**
+ * Create a hover alert for any element
+ * @param {string} selector - CSS selector for the element
+ * @param {string} message - Alert message
+ * @param {string} type - Alert type: 'info', 'success', 'warning', 'error'
+ */
+function addHoverAlert(selector, message, type = 'info') {
+  const elements = document.querySelectorAll(selector);
+  elements.forEach(element => {
+    // Skip if already has alert
+    if (element.querySelector('.alert-popup')) return;
+
+    // Create alert container
+    const alertContainer = document.createElement('div');
+    alertContainer.className = 'hover-alert';
+
+    // Create alert popup
+    const alertPopup = document.createElement('div');
+    alertPopup.className = `alert-popup ${type}`;
+    alertPopup.textContent = message;
+
+    // Wrap element if needed
+    if (element.parentNode.classList.contains('hover-alert')) return;
+
+    // Insert alert
+    element.parentNode.insertBefore(alertContainer, element);
+    alertContainer.appendChild(element);
+    alertContainer.appendChild(alertPopup);
+  });
+}
+
+// Initialize hover alerts on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Add hover alerts to form elements
+  addHoverAlert('.otp-input', 'Enter one digit of your 6-digit OTP', 'info');
+  addHoverAlert('button[type="submit"]', 'Verify OTP to proceed with password reset', 'success');
+  addHoverAlert('a[href*="resend"]', 'Request a new OTP if the previous one expired', 'warning');
+});
+
+</script>
+
+</body>
+</html>

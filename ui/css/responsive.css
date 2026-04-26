@@ -1,0 +1,135 @@
+/* Tablets */
+@media (max-width: 900px) {
+  .main {
+    flex-direction: column;
+    padding: 0 16px;
+  }
+
+  .info-box,
+  .login-box {
+    width: 100%;
+    min-width: unset;
+  }
+}
+@media (max-width: 768px) {
+
+  .header {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .header-right {
+    justify-content: center;
+  }
+
+  .gov-combined-logo {
+    height: 50px;
+  }
+}
+
+
+/* Mobile */
+@media (max-width: 600px) {
+
+  .gov-topbar {
+    flex-direction: column;
+    text-align: center;
+    gap: 5px;
+  }
+
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .navbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .navbar a {
+    margin: 5px 8px;
+    font-size: 13px;
+  }
+
+  .login-box button {
+    font-size: 14px;
+  }
+}
+@media (max-width: 900px) {
+  .stats-grid,
+  .action-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .stats-grid,
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card h3 {
+    font-size: 22px;
+  }
+}
+@media (max-width: 600px) {
+  .complaint-card {
+    flex-direction: column;
+  }
+
+  .complaint-card img {
+    width: 100%;
+    height: 180px;
+  }
+}
+@media (max-width: 600px) {
+  .image-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 600px) {
+
+  .header {
+    flex-direction: column;
+    text-align: center;
+    border-radius: 0 0 20px 20px;
+  }
+
+  .navbar {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .gov-topbar {
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+  }
+}
+@media (max-width: 600px) {
+  .navbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .navbar {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .nav-center {
+    order: 2;
+    margin: 0;
+  }
+
+  .nav-right {
+    order: 1;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V-Connect | My Complaints</title>
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/govt-theme.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+<script src="../../ui/js/translator.js"></script>
+</head>
+
+<body>
+
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>My Complaints</span>
+</div>
+
+<div class="header">
+  <img src="V-Connect.jpeg" alt="Logo" class="main-logo">
+  <div>
+    <h1>V-Connect</h1>
+    <p>Track Your Reported Problems</p>
+  </div>
+  <!-- Telangana + Rising Telangana -->
+  <img src="../../gov-logos.png" class="gov-logos">
+</div>
+
+<div class="navbar">
+  <a href="dashboard.html">Dashboard</a>
+  <a href="report-problem.html">Report Problem</a>
+  <a href="profile.html">Profile</a>
+  <a href="../../login.html">Logout</a>
+</div>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - My Complaints • VConnect - My Complaints • VConnect - My Complaints</span></div>
+  <h2>My Complaints</h2>
+  <p>Track your reported problems</p>
+</div>
+
+<div id="complaintNotificationBanner" class="dashboard-notification-banner" style="display:none;"></div>
+
+<div class="dashboard">
+  <h2 class="section-title">My Submitted Complaints</h2>
+
+  <!-- EMPTY CONTAINER -->
+  <div class="complaint-list" id="complaintList"></div>
+</div>
+
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+
+<script>
+if (localStorage.getItem("isLoggedIn") !== "true") {
+  window.location.href = "../../login.html";
+}
+
+const userMobile = localStorage.getItem("userMobile");
+console.log("Current user mobile from localStorage:", userMobile);
+
+if (!userMobile) {
+  console.error("No userMobile found in localStorage");
+  document.getElementById("complaintList").innerHTML = "<p style='color: red;'>Error: User not properly logged in. Please login again.</p>";
+} else {
+  // Fetch user-specific complaints instead of all complaints
+  fetch(`http://localhost:5000/api/complaints/user/${userMobile}`)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log("User complaints from API:", data);
+
+      const list = document.getElementById("complaintList");
+
+      if (!data || data.length === 0) {
+        list.innerHTML = "<p>No complaints found for your account.</p>";
+        return;
+      }
+
+      list.innerHTML = ""; // clear container
+
+      data.forEach(c => {
+        list.innerHTML += `
+          <div class="complaint-card">
+            <img src="${c.image}" alt="Complaint image">
+            <div class="complaint-info">
+              <h3>${c.type}</h3>
+              <p><strong>Location:</strong> ${c.location}</p>
+              <p><strong>Description:</strong> ${c.description || 'No description'}</p>
+              <span class="status ${c.status.toLowerCase()}">${c.status}</span>
+              <p><small>Submitted: ${c.created_at ? new Date(c.created_at).toLocaleString() : 'Unknown date'}</small></p>
+            </div>
+          </div>
+        `;
+      });
+    })
+    .catch(err => {
+      console.error("Fetch error:", err);
+      document.getElementById("complaintList").innerHTML = "<p style='color: red;'>Error loading complaints. Please try again later.</p>";
+    });
+}
+
+function getStoredNotifications() {
+  return JSON.parse(localStorage.getItem("citizenNotifications")) || [];
+}
+
+function getUserNotifications() {
+  return getStoredNotifications()
+    .filter(n => n.userMobile === userMobile)
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+}
+
+function openNotifications() {
+  window.location.href = "notifications.html";
+}
+
+function renderComplaintNotificationBanner() {
+  const banner = document.getElementById("complaintNotificationBanner");
+  const notifications = getUserNotifications();
+  if (!userMobile || notifications.length === 0) {
+    banner.style.display = "none";
+    return;
+  }
+
+  const latest = notifications[0];
+  banner.innerHTML = `
+    <div style="flex: 1;">
+      <p style="margin:0 0 8px 0; color:#2563eb; font-size:12px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase;">Latest Admin Alert</p>
+      <h3 style="margin:0; font-size:20px; color:#0f172a; line-height:1.2;">${latest.title}</h3>
+      <p style="margin:10px 0 0 0; color:#334155; line-height:1.6;">${latest.message}</p>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+      <button onclick="openNotifications()" style="border:none; padding:11px 18px; border-radius:14px; background:#2563eb; color:white; cursor:pointer; font-weight:700;">View Notifications</button>
+      <span style="font-size:12px; color:#475569;">${new Date(latest.timestamp).toLocaleString()}</span>
+    </div>
+  `;
+  banner.style.display = "flex";
+  banner.style.alignItems = "center";
+  banner.style.justifyContent = "space-between";
+  banner.style.flexWrap = "wrap";
+}
+
+renderComplaintNotificationBanner();
+</script>
+
+</body>
+</html>

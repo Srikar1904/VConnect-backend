@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Login | V-Connect</title>
+  <link rel="stylesheet" href="../ui/css/base.css">
+  <link rel="stylesheet" href="../ui/css/govt-theme.css">
+  <link rel="stylesheet" href="../ui/css/layout.css">
+  <link rel="stylesheet" href="../ui/css/responsive.css">
+  <link rel="stylesheet" href="../ui/css/admin.css">
+<script src="../ui/js/translator.js"></script>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ================= GOVT TOP BAR ================= -->
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>Official Citizen Grievance Portal</span>
+</div>
+
+<!-- ================= HEADER ================= -->
+<div class="header">
+  <img src="../V-Connect.jpeg" class="main-logo" alt="VConnect Logo">
+
+  <div>
+    <h1>V-Connect</h1>
+    <p>Admin Portal</p>
+  </div>
+
+  <img src="../gov-logos.png" class="gov-logos" alt="Gov Logos">
+</div>
+
+<!-- ================= NAVBAR ================= -->
+<div class="navbar">
+  <div class="nav-center">
+    <a href="../index.html">Home</a>
+    <a href="../about.html">About</a>
+    <a href="../how-it-works.html">How It Works</a>
+    <a href="../help.html">Help</a>
+  </div>
+</div>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - Admin Login • VConnect - Admin Login • VConnect - Admin Login</span></div>
+  <h2>Admin Login</h2>
+  <p>Secure access to administrative control panel</p>
+</div>
+
+<!-- ================= MAIN LOGIN AREA ================= -->
+<div class="main">
+  <!-- LOGIN BOX -->
+  <div class="login-box" style="margin: 0 auto; max-width: 500px; width: 100%;">
+    <h2>Login to Admin Dashboard</h2>
+
+    <div class="login-form active">
+      <label>Name</label>
+      <input type="text" id="username" placeholder="Enter Registered Name" required>
+
+      <label>Password</label>
+      <div class="password-field">
+        <input type="password" id="password" placeholder="Enter password" required>
+      </div>
+
+      <button type="button" onclick="login()" style="margin-top: 15px;">Login as Admin</button>
+      
+      <!-- DEBUG INFO -->
+      <div id="debugInfo" style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 5px; font-size: 12px; display: none;">
+        <strong>Debug Info:</strong><br>
+        Stored Name: <span id="storedNameDebug">-</span><br>
+        Stored Password: <span id="storedPassDebug">-</span>
+      </div>
+      <button type="button" onclick="toggleDebug()" style="margin-top: 10px; background: #999; padding: 8px 15px; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">Show Debug Info</button>
+      
+      <p style="text-align:center; margin-top:20px; color: #555;">
+        New Admin? <a href="admin-register.html" style="color: var(--primary); font-weight: bold; text-decoration: none;">Register here</a>
+      </p>    </div>
+  </div>
+</div>
+
+<script>
+function toggleDebug() {
+  const debugInfo = document.getElementById("debugInfo");
+  const storedName = localStorage.getItem("registeredAdminName") || "NOT FOUND";
+  const storedPass = localStorage.getItem("registeredAdminPassword") || "NOT FOUND";
+  
+  document.getElementById("storedNameDebug").textContent = storedName;
+  document.getElementById("storedPassDebug").textContent = storedPass === "NOT FOUND" ? "NOT FOUND" : "***";
+  
+  debugInfo.style.display = debugInfo.style.display === "none" ? "block" : "none";
+  console.log("Stored Admin Name:", storedName);
+  console.log("Stored Admin Password:", storedPass);
+}
+
+function login(){
+  const user = document.getElementById("username").value.trim();
+  const pass = document.getElementById("password").value.trim();
+
+  let regName = localStorage.getItem("registeredAdminName");
+  let regPass = localStorage.getItem("registeredAdminPassword");
+  
+  if (regName) regName = regName.trim();
+  if (regPass) regPass = regPass.trim();
+
+  // Log for debugging
+  console.log("Login Attempt - User Input Name:", user);
+  console.log("Login Attempt - Stored Name:", regName);
+  console.log("Login Attempt - Names Match (case-insensitive):", user.toLowerCase() === (regName ? regName.toLowerCase() : ""));
+
+  // 1. Check default fallback
+  if (user === "admin" && pass === "admin123") {
+    localStorage.setItem("adminLoggedIn","true");
+    showToast("✅ Admin Login successful! Redirecting...", "success");
+    setTimeout(() => window.location.href = "admin-dashboard.html", 1200);
+    return;
+  }
+
+  // 2. Missing Registration
+  if (!regName || !regPass) {
+    showToast("⚠️ No admin registration found in this browser. Using default credentials (admin/admin123) or <a href='admin-register.html'>register here</a>.", "warning");
+    console.warn("No registered admin found in localStorage");
+    return;
+  }
+
+  // 3. Check credentials case-insensitively for the name
+  if (user.toLowerCase() !== regName.toLowerCase()) {
+    showToast(`❌ Invalid Name. Expected: '${regName}' but got: '${user}'`, "error");
+    console.error("Name mismatch!");
+    return;
+  }
+
+  if (pass !== regPass) {
+    showToast("❌ Incorrect Password!", "error");
+    console.error("Password mismatch!");
+    return;
+  }
+
+  // Success 
+  localStorage.setItem("adminLoggedIn","true");
+  showToast("✅ Admin Login successful! Redirecting...", "success");
+  setTimeout(() => window.location.href = "admin-dashboard.html", 1200);
+}
+
+function showToast(message, type = "success") {
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<div class="toast-content"><span class="toast-message">${message}</span></div>`;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = "toastOut 0.4s ease forwards";
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
+
+// Display debug info on page load
+window.addEventListener('load', () => {
+  const storedName = localStorage.getItem("registeredAdminName");
+  if (storedName) {
+    console.log("✅ Found registered admin name:", storedName);
+  } else {
+    console.warn("⚠️ No registered admin found in localStorage");
+  }
+});
+</script>
+
+
+</script>
+<!-- FOOTER -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+</body>
+</html>

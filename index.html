@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V-Connect | Citizen Services Portal</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="ui/css/base.css">
+  <link rel="stylesheet" href="ui/css/govt-theme.css">
+  <link rel="stylesheet" href="ui/css/layout.css">
+  <link rel="stylesheet" href="ui/css/responsive.css">
+
+  <style>
+    /* Intro Screen */
+
+#intro{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:black;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+
+/* Video size = 3/4 screen */
+
+#intro video{
+  width:105vw;
+  max-height:97vh;
+  border-radius:12px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.6);
+}
+
+/* Main content initially hidden */
+
+#mainContent{
+  opacity:0;
+  transition:opacity 1.5s ease;
+}
+
+/* Fade elements */
+
+.fade-item{
+  opacity:0;
+  transform:translateY(20px);
+  transition:all 1s ease;
+}
+
+/* Visible state */
+
+.fade-visible{
+  opacity:1;
+  transform:translateY(0);
+}
+    /* Full screen landing page styles */
+    .landing-container {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .landing-logo {
+      width: 160px;
+      height: 120px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      margin-bottom: 30px;
+      animation: logoZoomIn 1.5s ease-out;
+    }
+
+    .landing-title {
+      color: white;
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      animation: fadeInUp 1s ease-out 0.5s both;
+    }
+
+    .landing-subtitle {
+      color: rgba(255,255,255,0.9);
+      font-size: 1.2rem;
+      margin-bottom: 40px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      animation: fadeInUp 1s ease-out 0.8s both;
+    }
+
+    .get-started-btn {
+      background: white;
+      color: var(--primary);
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      animation: fadeInUp 1s ease-out 1.1s both, buttonPulse 2s ease-in-out 3s infinite;
+    }
+
+    .get-started-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4), 0 0 20px rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.95);
+      color: var(--secondary);
+    }
+
+    .gov-logos-landing {
+      width: 200px;
+      height: auto;
+      margin-top: 50px;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: fadeInUp 1s ease-out 1.4s both;
+    }
+
+    /* Animations */
+    @keyframes logoZoomIn {
+      0% {
+        transform: scale(0.3);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes buttonPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      }
+      50% {
+        transform: scale(1.08);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.4), 0 0 20px rgba(255,255,255,0.3);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .landing-title {
+        font-size: 2rem;
+      }
+
+      .landing-subtitle {
+        font-size: 1rem;
+      }
+
+      .landing-logo {
+        width: 140px;
+        height: 100px;
+        animation: logoZoomIn 1.5s ease-out;
+      }
+
+      .gov-logos-landing {
+        width: 150px;
+        margin-top: 30px;
+        padding: 12px 15px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        animation: fadeInUp 1s ease-out 1.4s both;
+      }
+    }
+  </style>
+<script src="./ui/js/translator.js"></script>
+</head>
+
+<body>
+  <!-- Intro Animation -->
+<div id="intro">
+  <video id="introVideo" autoplay playsinline>
+    <source src="soundanimated.mp4" type="video/mp4">
+  </video>
+</div>
+  <div id="mainContent" class="landing-container">
+    <img src="V-Connect.jpeg" alt="V-Connect Logo" class="landing-logo">
+
+    <h1 class="landing-title">Welcome to V-Connect</h1>
+    <p class="landing-subtitle">Your Gateway to Government Citizen Services</p>
+
+    <a href="role-selection.html" class="get-started-btn">Get Started</a>
+
+    <img src="gov-logos.png" alt="Government of Telangana" class="gov-logos-landing">
+  </div>
+  <script>
+
+const video = document.getElementById("introVideo");
+const introDiv = document.getElementById("intro");
+const mainContent = document.getElementById("mainContent");
+
+// Attempt to play automatically unmuted initially
+let playPromise = video.play();
+
+if (playPromise !== undefined) {
+  playPromise.catch(e => {
+    // If the browser blocks unmuted autoplay, smoothly graceful mute it so it can autoplay at least visually!
+    video.muted = true;
+    video.play().catch(err => {
+      console.log("Video fail completely:", err);
+      video.onended(); // skip if it fails even while muted
+    });
+
+    // Create a beautiful "Click for Sound" overlay dynamically over the video
+    const unmuteBtn = document.createElement("div");
+    unmuteBtn.innerHTML = "🔊 Tap anywhere to enable sound!";
+    unmuteBtn.style.cssText = "position:absolute; top:80%; left:50%; transform:translate(-50%, -50%); background:rgba(255,255,255,0.25); backdrop-filter:blur(12px); color:white; padding:15px 35px; font-size:1.5rem; border-radius:50px; border:2px solid rgba(255,255,255,0.5); font-weight:bold; cursor:pointer; font-family:sans-serif; text-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index:10001; animation: fadeInUp 1.5s ease; width:max-content; transition: 0.3s all;";
+    
+    // Hover effect
+    unmuteBtn.onmouseenter = () => { unmuteBtn.style.background = 'rgba(255,255,255,0.8)'; unmuteBtn.style.color = '#0c2340'; };
+    unmuteBtn.onmouseleave = () => { unmuteBtn.style.background = 'rgba(255,255,255,0.25)'; unmuteBtn.style.color = 'white'; };
+
+    introDiv.appendChild(unmuteBtn);
+    
+    introDiv.addEventListener("click", function enableSound() {
+        video.muted = false;
+        video.currentTime = 0; // Restart so they hear the whole thing
+        video.play();
+        unmuteBtn.remove();
+        introDiv.removeEventListener("click", enableSound);
+    });
+  });
+}
+
+// If the video source doesn't exist (e.g. 404 Not Found), skip intro
+video.addEventListener('error', () => {
+    console.error("Video file not found or failed to load. Skipping intro...");
+    video.onended();
+});
+
+video.onended = function(){
+  introDiv.style.transition = "opacity 0.8s ease";
+  introDiv.style.opacity = "0";
+  setTimeout(() => {
+    introDiv.style.display = "none";
+    mainContent.style.opacity = "1";
+    mainContent.classList.add("fade-visible");
+  }, 800);
+}
+
+// ================= SMOOTH HOVER ALERT SYSTEM =================
+
+/**
+ * Create a hover alert for any element
+ * @param {string} selector - CSS selector for the element
+ * @param {string} message - Alert message
+ * @param {string} type - Alert type: 'info', 'success', 'warning', 'error'
+ */
+function addHoverAlert(selector, message, type = 'info') {
+  const elements = document.querySelectorAll(selector);
+  elements.forEach(element => {
+    // Skip if already has alert
+    if (element.querySelector('.alert-popup')) return;
+
+    // Create alert container
+    const alertContainer = document.createElement('div');
+    alertContainer.className = 'hover-alert';
+
+    // Create alert popup
+    const alertPopup = document.createElement('div');
+    alertPopup.className = `alert-popup ${type}`;
+    alertPopup.textContent = message;
+
+    // Wrap element if needed
+    if (element.parentNode.classList.contains('hover-alert')) return;
+
+    // Insert alert
+    element.parentNode.insertBefore(alertContainer, element);
+    alertContainer.appendChild(element);
+    alertContainer.appendChild(alertPopup);
+  });
+}
+
+/**
+ * Show a temporary toast notification
+ * @param {string} message - Toast message
+ * @param {string} type - Toast type: 'success', 'error', 'warning', 'loading'
+ * @param {number} duration - Duration in milliseconds
+ */
+function showToast(message, type = 'info', duration = 4000) {
+  // Create toast container if not exists
+  let container = document.querySelector('.toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
+
+  // Create toast
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+
+  const content = document.createElement('div');
+  content.className = 'toast-content';
+
+  // Add icon based on type
+  const icon = document.createElement('span');
+  switch(type) {
+    case 'success': icon.textContent = '✓'; break;
+    case 'error': icon.textContent = '✕'; break;
+    case 'warning': icon.textContent = '⚠'; break;
+    case 'loading':
+      const spinner = document.createElement('div');
+      spinner.className = 'toast-spinner';
+      content.appendChild(spinner);
+      break;
+    default: icon.textContent = 'ℹ';
+  }
+
+  if (type !== 'loading') content.appendChild(icon);
+
+  const text = document.createElement('span');
+  text.textContent = message;
+  content.appendChild(text);
+
+  toast.appendChild(content);
+
+  // Add close button
+  if (type !== 'loading') {
+    const closeBtn = document.createElement('span');
+    closeBtn.className = 'toast-close';
+    closeBtn.textContent = '×';
+    closeBtn.onclick = () => removeToast(toast);
+    toast.appendChild(closeBtn);
+  }
+
+  container.appendChild(toast);
+
+  // Auto remove
+  if (type !== 'loading') {
+    setTimeout(() => removeToast(toast), duration);
+  }
+
+  return toast;
+}
+
+function removeToast(toast) {
+  toast.style.animation = 'toastOut 0.4s ease forwards';
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.parentNode.removeChild(toast);
+    }
+  }, 400);
+}
+
+// Initialize hover alerts on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Add hover alerts to common elements
+  addHoverAlert('.get-started-btn', 'Click to access citizen services and file complaints', 'info');
+  addHoverAlert('a[href*="login"]', 'Login to your account to access services', 'success');
+  addHoverAlert('a[href*="register"]', 'Create a new account to get started', 'success');
+  addHoverAlert('a[href*="help"]', 'Get help and support for using the portal', 'info');
+  addHoverAlert('a[href*="about"]', 'Learn more about V-Connect and our mission', 'info');
+});
+
+</script>
+</body>
+</html>

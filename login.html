@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>V-Connect | Citizen Login</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="ui/css/base.css">
+  <link rel="stylesheet" href="ui/css/govt-theme.css">
+  <link rel="stylesheet" href="ui/css/layout.css">
+  <link rel="stylesheet" href="ui/css/responsive.css">
+<script src="./ui/js/translator.js"></script>
+</head>
+
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ================= GOVT TOP BAR ================= -->
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>Official Citizen Grievance Portal</span>
+</div>
+
+<!-- ================= HEADER ================= -->
+  <div class="header">
+  <img src="V-Connect.jpeg" class="main-logo">
+
+  <div>
+    <h1>V-Connect</h1>
+    <p>Citizen Services Portal</p>
+  </div>
+
+  <!-- Telangana + Rising Telangana -->
+  <img src="gov-logos.png" class="gov-logos">
+</div>
+
+<!-- ================= NAVBAR ================= -->
+<div class="navbar">
+  <!-- Center links -->
+  <div class="nav-center">
+    <a href="about.html">About</a>
+    <a href="how-it-works.html">How It Works</a>
+    <a href="help.html">Help</a>
+  </div>
+
+  <!-- Right profile -->
+  <div class="nav-right">
+    <a href="ui/pages/profile.html" class="profile-btn">👤 Profile</a>
+  </div>
+</div>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - Citizen Login • VConnect - Citizen Login • VConnect - Citizen Login</span></div>
+  <h2>Citizen Login</h2>
+  <p>Secure access to government services</p>
+</div>
+
+<!-- ================= NOTICE ================= -->
+<div class="notice">
+  ⚠ Citizens are requested not to share their OTP or password with anyone.
+</div>
+
+<!-- ================= MAIN LOGIN AREA ================= -->
+<div class="main">
+
+  <!-- INFO PANEL -->
+  <div class="info-box">
+    <div class="info-step step-1">
+      <h2>Why V-Connect?</h2>
+    </div>
+    <div class="info-step step-2">
+      <p>
+        V-Connect allows citizens to report real-time problems in their streets
+        by uploading images. These issues are reviewed by village authorities
+        and resolved transparently with proper fund tracking.
+      </p>
+    </div>
+    <div class="info-step step-3">
+      <h3>What You Can Do</h3>
+    </div>
+    <div class="info-step step-4">
+      <ul>
+        <li class="feature-item">📸 Upload problem image</li>
+        <li class="feature-item">📍 Report local issues</li>
+        <li class="feature-item">📊 Track complaint status</li>
+        <li class="feature-item">💰 View fund usage details</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- LOGIN BOX -->
+  <div class="login-box">
+  <h2>Login to V-Connect</h2>
+
+
+
+  <!-- Citizen Login Form -->
+  <div id="citizenForm" class="login-form active">
+    <label>Mobile Number or Name</label>
+    <input type="text" id="mobile" placeholder="Enter your mobile number or name" required>
+
+    <label>Password</label>
+<div class="password-field">
+  <input type="password" id="password" placeholder="Enter password" required>
+  <span class="toggle-password" onclick="togglePassword('password', this)">👁️</span>
+</div>
+
+    <button type="button" onclick="loginAsCitizen()">Login as Citizen</button>
+  </div>
+
+
+
+  <p class="login-links">
+    <a href="forgot-password.html">Forgot Password?</a><br><br>
+    New user? <a href="register.html">Register here</a>
+  </p>
+</div>
+
+
+<!-- ================= FOOTER ================= -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+<script>
+  function loginAsCitizen() {
+    const inputVal = document.getElementById("mobile").value.trim();
+    const password = document.getElementById("password").value;
+
+    // Retrieve dynamically saved credentials from Registration Form
+    const regMobile = localStorage.getItem("userMobile");
+    const regName = localStorage.getItem("userName");
+    const regPass = localStorage.getItem("userPassword");
+
+    if (!regMobile || !regPass) {
+      showToast("❌ No citizen account found! Please register first.", "error");
+      return false;
+    }
+
+    // Validate if the input matches either the registered Mobile OR the registered Name (case-insensitive)
+    const matchesMobile = (inputVal === regMobile);
+    const matchesName = (regName && inputVal.toLowerCase() === regName.toLowerCase());
+
+    if (!matchesMobile && !matchesName) {
+      showToast("❌ Invalid Mobile Number or Name", "error");
+      return false;
+    }
+
+    if (password !== regPass) {
+      showToast("❌ Incorrect Password", "error");
+      return false;
+    }
+
+    // Save session
+    localStorage.setItem("isLoggedIn", "true");
+
+    showToast("✅ Citizen login successful! Redirecting...", "success");
+
+    setTimeout(() => {
+      window.location.href = "ui/pages/dashboard.html";
+    }, 1200);
+
+    return false;
+  }
+
+
+
+  function togglePassword(inputId, iconElement) {
+    const input = document.getElementById(inputId);
+    if (input.type === "password") {
+      input.type = "text";
+      iconElement.textContent = "🙈"; // Closed eye when visible
+    } else {
+      input.type = "password";
+      iconElement.textContent = "👁️"; // Open eye when hidden
+    }
+  }
+
+
+</script>
+
+<script>
+  function showToast(message, type = "success") {
+    const container = document.getElementById("toastContainer");
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.innerHTML = message;
+
+    container.appendChild(toast);
+
+    // Auto remove
+    setTimeout(() => {
+      toast.style.animation = "slideOut 0.4s ease forwards";
+      setTimeout(() => toast.remove(), 400);
+    }, 3000);
+  }
+
+// ================= SMOOTH HOVER ALERT SYSTEM =================
+
+/**
+ * Create a hover alert for any element
+ * @param {string} selector - CSS selector for the element
+ * @param {string} message - Alert message
+ * @param {string} type - Alert type: 'info', 'success', 'warning', 'error'
+ */
+function addHoverAlert(selector, message, type = 'info') {
+  const elements = document.querySelectorAll(selector);
+  elements.forEach(element => {
+    // Skip if already has alert
+    if (element.querySelector('.alert-popup')) return;
+
+    // Create alert container
+    const alertContainer = document.createElement('div');
+    alertContainer.className = 'hover-alert';
+
+    // Create alert popup
+    const alertPopup = document.createElement('div');
+    alertPopup.className = `alert-popup ${type}`;
+    alertPopup.textContent = message;
+
+    // Wrap element if needed
+    if (element.parentNode.classList.contains('hover-alert')) return;
+
+    // Insert alert
+    element.parentNode.insertBefore(alertContainer, element);
+    alertContainer.appendChild(element);
+    alertContainer.appendChild(alertPopup);
+  });
+}
+
+// Initialize hover alerts on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Add hover alerts to form elements
+  addHoverAlert('input[type="text"]', 'Enter your registered mobile number', 'info');
+  addHoverAlert('input[type="password"]', 'Enter your account password', 'info');
+  addHoverAlert('button[type="submit"]', 'Click to securely login to your account', 'success');
+  addHoverAlert('a[href*="forgot"]', 'Reset your password if you forgot it', 'warning');
+  addHoverAlert('a[href*="register"]', 'Create a new account if you don\'t have one', 'success');
+  addHoverAlert('input[type="radio"]', 'Select user type: Citizen or Admin', 'info');
+});
+
+</script>
+</body>
+</html>

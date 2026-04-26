@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>V-Connect | Citizen Dashboard</title>
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/govt-theme.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <script>
+  if (localStorage.getItem("isLoggedIn") !== "true") {
+    window.location.href = "../../login.html";
+  }
+</script>
+
+<script src="../../ui/js/translator.js"></script>
+</head>
+
+<body>
+<div class="toast-container" id="toastContainer"></div>
+<!-- TOP BAR -->
+<div class="gov-topbar">
+  <span>Government of Telangana</span>
+  <span>Citizen Dashboard</span>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <img src="V-Connect.jpeg" alt="Logo" class="main-logo">
+  <div>
+    <h1>V-Connect</h1>
+    <p>Smart Village Grievance System</p>
+  </div>
+  <!-- Telangana + Rising Telangana -->
+  <img src="../../gov-logos.png" class="gov-logos">
+</div>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <a href="report-problem.html">Report Problem</a>
+  <a href="my-complaints.html">My Complaints</a>
+  <a href="profile.html">Profile</a>
+  <a href="#" onclick="logout()">Logout</a>
+</div>
+
+<!-- ================= SECTION TITLE ================= -->
+<div class="header-section-title">
+  <div class="scrolling-bg"><span>VConnect - Citizen Dashboard • VConnect - Citizen Dashboard • VConnect - Citizen Dashboard</span></div>
+  <h2>Citizen Dashboard</h2>
+  <p>Your grievances at a glance</p>
+</div>
+
+<!-- MAIN DASHBOARD -->
+<div class="dashboard">
+
+  <!-- WELCOME -->
+  <h2 id="welcomeText">Welcome 👋</h2>
+
+  <div id="dashboardNotificationTop" class="dashboard-notification-banner" style="display:none;"></div>
+
+  <!-- STATS -->
+  <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); gap: 20px;">
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; padding: 28px; border-radius: 22px; box-shadow: 0 18px 36px rgba(0,0,0,0.12);">
+      <h4 style="margin: 0 0 12px 0; font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;">Total Complaints</h4>
+      <p id="totalCount" style="margin: 0; font-size: 48px; font-weight: 700;">0</p>
+    </div>
+
+    <div class="stat-card pending" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; text-align: center; padding: 28px; border-radius: 22px; box-shadow: 0 18px 36px rgba(0,0,0,0.12);">
+      <h4 style="margin: 0 0 12px 0; font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;">⏳ Pending</h4>
+      <p id="pendingCount" style="margin: 0; font-size: 48px; font-weight: 700;">0</p>
+    </div>
+
+    <div class="stat-card progress" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; text-align: center; padding: 28px; border-radius: 22px; box-shadow: 0 18px 36px rgba(0,0,0,0.12);">
+      <h4 style="margin: 0 0 12px 0; font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;">🔄 In Progress</h4>
+      <p id="progressCount" style="margin: 0; font-size: 48px; font-weight: 700;">0</p>
+    </div>
+
+    <div class="stat-card resolved" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; text-align: center; padding: 28px; border-radius: 22px; box-shadow: 0 18px 36px rgba(0,0,0,0.12);">
+      <h4 style="margin: 0 0 12px 0; font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;">✅ Resolved</h4>
+      <p id="resolvedCount" style="margin: 0; font-size: 48px; font-weight: 700;">0</p>
+    </div>
+
+  </div>
+
+  <div style="text-align: center; margin: 20px 0;">
+    <p style="color: #666; font-size: 13px; margin-bottom: 12px;">📊 Updates automatically every 5 seconds</p>
+    <button id="refreshBtn" onclick="refreshStats()" style="padding: 12px 22px; border: none; border-radius: 10px; background: #2f80ed; color: white; cursor: pointer; font-weight: 600;">🔄 Refresh Now</button>
+  </div>
+
+
+  <!-- QUICK ACTIONS -->
+  <h3 class="section-title">Quick Actions</h3>
+
+  <div class="action-grid">
+    <a href="report-problem.html" class="action-card">📸 Report New Problem</a>
+    <a href="my-complaints.html" class="action-card">📋 View My Complaints</a>
+    <a href="schemes.html" class="action-card">📜 Govt Schemes</a>
+    <a href="profile.html" class="action-card">👤 Update Profile</a>
+  </div>
+
+</div>
+<script>
+const mobile = localStorage.getItem("userMobile");
+
+function getStoredNotifications() {
+  return JSON.parse(localStorage.getItem("citizenNotifications")) || [];
+}
+
+function getUserNotifications() {
+  return getStoredNotifications()
+    .filter(n => n.userMobile === mobile)
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+}
+
+function markNotificationsRead() {
+  const notifications = getStoredNotifications();
+  const updated = notifications.map(n => {
+    if (n.userMobile === mobile && !n.read) {
+      return { ...n, read: true };
+    }
+    return n;
+  });
+  localStorage.setItem("citizenNotifications", JSON.stringify(updated));
+}
+
+function openNotifications() {
+  window.location.href = "notifications.html";
+}
+
+function renderDashboardNotificationBanner() {
+  const banner = document.getElementById("dashboardNotificationTop");
+  const userNotifications = getUserNotifications();
+  if (!mobile || userNotifications.length === 0) {
+    banner.style.display = "none";
+    return;
+  }
+
+  const unreadNotifications = userNotifications.filter(n => !n.read);
+  const latest = unreadNotifications.length ? unreadNotifications[0] : userNotifications[0];
+  const unreadCount = unreadNotifications.length;
+
+  banner.innerHTML = `
+    <div style="flex: 1;">
+      <p style="margin:0 0 8px 0; color:#2563eb; font-size:12px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase;">${unreadCount ? `New update${unreadCount > 1 ? 's' : ''}` : 'Latest update'}</p>
+      <h3 style="margin:0; font-size:20px; color:#0f172a; line-height:1.2;">${latest.title}</h3>
+      <p style="margin:10px 0 0 0; color:#334155; line-height:1.6;">${latest.message}</p>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+      <button onclick="openNotifications()" style="border:none; padding:11px 18px; border-radius:14px; background:#2563eb; color:white; cursor:pointer; font-weight:700;">View Notifications</button>
+      <span style="font-size:12px; color:#475569;">${new Date(latest.timestamp).toLocaleString()}</span>
+    </div>
+  `;
+
+  banner.style.display = "flex";
+  banner.style.alignItems = "center";
+  banner.style.justifyContent = "space-between";
+  banner.style.flexWrap = "wrap";
+
+  if (unreadCount > 0) {
+    markNotificationsRead();
+  }
+}
+
+function updateCountWithAnimation(elementId, newCount) {
+  const element = document.getElementById(elementId);
+  const currentCount = parseInt(element.innerText) || 0;
+  if (currentCount !== newCount) {
+    element.style.transition = "all 0.25s ease";
+    element.style.transform = "scale(1.15)";
+    element.innerText = newCount;
+    setTimeout(() => {
+      element.style.transform = "scale(1)";
+    }, 150);
+  }
+}
+
+function fetchStats() {
+  if (!mobile) return;
+  fetch("http://localhost:5000/api/dashboard/stats/" + mobile)
+    .then(res => res.json())
+    .then(data => {
+      updateCountWithAnimation("totalCount", data.total || 0);
+      updateCountWithAnimation("pendingCount", data.pending || 0);
+      updateCountWithAnimation("progressCount", data.progress || 0);
+      updateCountWithAnimation("resolvedCount", data.resolved || 0);
+    })
+    .catch(err => console.error("Error fetching stats:", err));
+}
+
+function refreshStats() {
+  fetchStats();
+  const btn = document.getElementById("refreshBtn");
+  if (btn) {
+    btn.innerText = "✅ Refreshing...";
+    setTimeout(() => {
+      btn.innerText = "🔄 Refresh Now";
+    }, 1000);
+  }
+}
+
+function logout() {
+  localStorage.removeItem("isLoggedIn");
+  localStorage.removeItem("userMobile");
+  window.location.href = "../../login.html";
+}
+
+if (localStorage.getItem("isLoggedIn") !== "true") {
+  window.location.href = "../../login.html";
+}
+
+if (mobile) {
+  document.getElementById("welcomeText").innerText =
+    "Welcome, Citizen (" + mobile + ")";
+}
+
+renderDashboardNotificationBanner();
+fetchStats();
+setInterval(() => {
+  renderDashboardNotificationBanner();
+  fetchStats();
+}, 5000);
+</script>
+
+<!-- FOOTER -->
+<footer class="gov-footer">
+  <p>© 2026 V-Connect | Government of Telangana</p>
+  <p>📞 <strong>Helpdesk:</strong> 1800-XXX-XXXX | 📧 <a href="mailto:vconnect468@gmail.com">vconnect468@gmail.com</a></p>
+  <p>🕐 Available 24/7 | 📍 All Districts | 🔒 Secure & Confidential</p>
+  <p style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px;">
+    <strong>Support:</strong> Technical Issues | Account Help | Complaint Status | General Queries
+  </p>
+</footer>
+
+</body>
+</html>
