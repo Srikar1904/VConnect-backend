@@ -90,7 +90,7 @@ function getFundAllocation(complaintId) {
   return allocations[complaintId] || null;
 }
 
-fetch("http://localhost:5000/api/admin/complaints")
+fetch("https://vconnect-backend-c4ra.onrender.com/api/admin/complaints")
 .then(res => {
   console.log("API Response Status:", res.status);
   

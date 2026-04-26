@@ -96,7 +96,7 @@ if(localStorage.getItem("adminLoggedIn") !== "true"){
 
 <script>
 function fetchAdminStats() {
-  fetch("http://localhost:5000/api/admin/complaints")
+  fetch("https://vconnect-backend-c4ra.onrender.com/api/admin/complaints")
   .then(res => res.json())
   .then(data => {
     const totalCount = data.length || 0;

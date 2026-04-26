@@ -180,7 +180,7 @@ function updateCountWithAnimation(elementId, newCount) {
 
 function fetchStats() {
   if (!mobile) return;
-  fetch("http://localhost:5000/api/dashboard/stats/" + mobile)
+  fetch("https://vconnect-backend-c4ra.onrender.com/api/dashboard/stats/" + mobile)
     .then(res => res.json())
     .then(data => {
       updateCountWithAnimation("totalCount", data.total || 0);

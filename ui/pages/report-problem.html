@@ -378,7 +378,7 @@ function submitWithImageData(imageData) {
 
   console.log("📤 Sending:", payload);
 
-  fetch("http://localhost:5000/api/complaints/add", {
+  fetch("https://vconnect-backend-c4ra.onrender.com/api/complaints/add", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)

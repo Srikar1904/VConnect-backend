@@ -74,7 +74,7 @@ if (!userMobile) {
   document.getElementById("complaintList").innerHTML = "<p style='color: red;'>Error: User not properly logged in. Please login again.</p>";
 } else {
   // Fetch user-specific complaints instead of all complaints
-  fetch(`http://localhost:5000/api/complaints/user/${userMobile}`)
+  fetch(`https://vconnect-backend-c4ra.onrender.com/api/complaints/user/${userMobile}`)
     .then(res => {
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);

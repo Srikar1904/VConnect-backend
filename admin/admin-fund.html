@@ -327,7 +327,7 @@ function loadComplaintDetails() {
   }
 
   // Fetch the complaint details
-  fetch(`http://localhost:5000/api/admin/complaints`)
+  fetch(`https://vconnect-backend-c4ra.onrender.com/api/admin/complaints`)
     .then(res => res.json())
     .then(data => {
       // Find the complaint with matching ID
@@ -416,7 +416,7 @@ function updateFund(){
   console.log("All Allocations:", allocations);
 
   // Also update the backend status
-  fetch(`http://localhost:5000/api/admin/update/${complaintId}`, {
+  fetch(`https://vconnect-backend-c4ra.onrender.com/api/admin/update/${complaintId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"

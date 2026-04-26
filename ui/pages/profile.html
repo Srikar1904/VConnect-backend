@@ -104,7 +104,7 @@ let imageBase64 = "";
 
 /* ---------------- LOAD PROFILE ---------------- */
 
-fetch("http://localhost:5000/api/profile/" + mobile)
+fetch("https://vconnect-backend-c4ra.onrender.com/api/profile/" + mobile)
 .then(res => res.json())
 .then(data => {
 
@@ -144,7 +144,7 @@ function sendOTP(){
     return;
   }
 
-  fetch("http://localhost:5000/api/send-otp",{
+  fetch("https://vconnect-backend-c4ra.onrender.com/api/send-otp",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({mobile})
@@ -160,7 +160,7 @@ function sendOTP(){
 
 function verifyOTP(otp){
 
-  fetch("http://localhost:5000/api/verify-otp",{
+  fetch("https://vconnect-backend-c4ra.onrender.com/api/verify-otp",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({mobile, otp})
@@ -189,7 +189,7 @@ function updateProfile(){
     profile_image: imageBase64
   };
 
-  fetch("http://localhost:5000/api/update-profile",{
+  fetch("https://vconnect-backend-c4ra.onrender.com/api/update-profile",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify(profileData)
