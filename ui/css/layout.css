@@ -37,18 +37,14 @@
 }
 
 /* ========== MAIN LAYOUT ========== */
-.main, 
-.role-page-container, 
-.dashboard, 
-.landing-container {
-  flex: 1; /* Grow to fill space and push footer down */
-  display: flex;
-  justify-content: center;
-  align-items: center; /* Center horizontally and vertically */
+.main {
   max-width: 1100px;
   margin: 40px auto;
+  display: flex;
+  align-items: flex-start;
+  /* aligns top edges */
+  justify-content: center;
   gap: 32px;
-  width: 100%;
 }
 
 
@@ -72,25 +68,11 @@
   flex: 1.2;
   /* slightly larger */
   min-width: 520px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .login-box {
   display: flex;
   flex-direction: column;
-  flex: 1; 
-  padding: 40px; /* More breathing room */
-  min-height: 450px;
-  justify-content: center;
-}
-
-.login-box h2 {
-  margin-top: 0;
-  color: var(--primary);
-  text-align: center;
-  margin-bottom: 20px;
 }
 
 
