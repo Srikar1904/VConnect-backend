@@ -11,6 +11,10 @@
 body {
   background: var(--bg-light);
   color: var(--text-dark);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Full viewport height */
+  margin: 0;
 }
 
 /* ========== TOP BAR ========== */
@@ -139,8 +143,8 @@ input, textarea, select {
 
 /* ========== FOOTER ========== */
 .gov-footer {
-  margin-top: 40px;
-  padding: 25px 20px;
+  margin-top: auto; /* Push to bottom of flex container */
+  padding: 30px 20px;
   text-align: center;
   font-size: 13px;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
